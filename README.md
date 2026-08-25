@@ -1,14 +1,15 @@
-# MTG Commander Hub V0.7.9
+# MTG Commander Hub V0.9.4
 
-Commander-Damage-Perspektive:
-- CMD-Modus richtet jetzt ALLE vier Quadranten nach dem Spieler aus, der Commander Damage einträgt.
-- Startet ein Spieler unten CMD, sind alle CMD-Werte für die untere Tischseite lesbar.
-- Startet ein Spieler oben CMD, drehen sich alle CMD-Werte um 180° und sind für die obere Tischseite lesbar.
-- Nach „Fertig“ kehrt jeder Quadrant zu seiner normalen Tisch-Ausrichtung zurück.
+3D Dice:
+- W100 ist jetzt ein echter Prozentwurf aus zwei sichtbaren Würfeln:
+  Zehnerwürfel 00–90 + Einerwürfel 0–9.
+- 00 + 0 wird als 100 gewertet.
+- Bei mehreren W100-Würfen wird pro Wurf ein eigenes Würfelpaar erzeugt.
+- Roll-Sound ergänzt; funktioniert sowohl beim Würfeln-Button als auch beim Swipe.
+- Würfelfarben im Overlay: Schwarz, Rot, Blau, Grün, Violett und Gold.
+- Die Farbgebung wird auf den transparenten 3D-Canvas angewendet, ohne die Physik zu verändern.
+- Bestehendes Commander-/Counter-Layout unverändert.
 
-Drei-Punkte-Menü:
-- nicht mehr bei Gift/CMD/Tax
-- sitzt jetzt mittig am äußeren Seitenrand des jeweiligen Quadranten
-- im CMD-Modus ausgeblendet
-
-Version V0.7.9
+Hinweis:
+Das Upstream-Projekt selbst vermerkt d9 ausdrücklich als Companion für die noch
+zu vervollständigende d100-Implementierung. Commander Hub kombiniert beide nun.

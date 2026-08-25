@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.9 — Lotus-style in-table Commander Damage mode */
+/* V0.9.4 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -914,7 +914,7 @@ body.game-running #game{display:block!important}
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 
-/* V0.7.9 — Commander Damage readability */
+/* V0.9.4 — Commander Damage readability */
 body.cmd-mode .table-player .table-top,
 body.cmd-mode .table-player .life-tap,
 body.cmd-mode .table-player .life-display,
@@ -938,7 +938,7 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
 .cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
 
 
-/* V0.7.9 — persistent player colors */
+/* V0.9.4 — persistent player colors */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 5px var(--player-color),
@@ -982,7 +982,7 @@ body.cmd-mode .table-player.cmd-target .cmd-mode-close{
 @keyframes lifeChangeIn{from{opacity:0;transform:translate(-50%,-42%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 body.cmd-mode .life-change{display:none}
 
-/* V0.7.9 — active player, HUD placement, responsive CMD labels, color picker */
+/* V0.9.4 — active player, HUD placement, responsive CMD labels, color picker */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 9px var(--player-color),
@@ -1036,7 +1036,7 @@ body.cmd-mode .life-change{display:none}
 @media(max-width:600px){.color-picker-grid{grid-template-columns:1fr 1fr}.table-hud{bottom:10px}}
 
 
-/* V0.7.9 — tabletop seating layout */
+/* V0.9.4 — tabletop seating layout */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 13px var(--player-color),
@@ -1125,7 +1125,7 @@ body.cmd-mode .table-player .table-bottom{pointer-events:none}
 }
 
 
-/* V0.7.9 — physical tabletop orientation fixes */
+/* V0.9.4 — physical tabletop orientation fixes */
 
 /* The opposite player's entire tile, including commander art, faces them.
    v0.7.7 counter-rotated :before; remove that counter rotation. */
@@ -1168,9 +1168,6 @@ body.sheet-opposite .bottom-sheet{
 
 /* If the app uses a generic sheet panel nested directly in the backdrop,
    rotate that too without rotating the backdrop itself. */
-body.sheet-opposite .sheet-backdrop > div:not(.sheet){
-  transform:rotate(180deg);
-}
 
 /* Preserve existing modal sizing while rotating around its own center. */
 body.sheet-opposite .sheet-backdrop{
@@ -1184,7 +1181,7 @@ body.sheet-opposite .sheet-backdrop{
 }
 
 
-/* V0.7.9 — CMD mode faces the player who opened it */
+/* V0.9.4 — CMD mode faces the player who opened it */
 
 /*
 Normal table:
@@ -1246,12 +1243,586 @@ body.cmd-mode .player-menu{opacity:0;pointer-events:none}
   .table-player.opposite-seat:nth-child(even) .player-menu{right:8px}
 }
 
+
+/* V0.9.4 — definitive menu placement + clockwise physical layout */
+
+/* Override every earlier nth-child/player-menu rule.
+   The menu now lives halfway up the OUTER edge of the physical quadrant. */
+.table-player.left-seat .player-menu,
+.table-player.right-seat .player-menu,
+.table-player:nth-child(odd) .player-menu,
+.table-player:nth-child(even) .player-menu,
+.table-player.opposite-seat:nth-child(odd) .player-menu,
+.table-player.opposite-seat:nth-child(even) .player-menu{
+  top:50% !important;
+  bottom:auto !important;
+  margin:0 !important;
+  transform:translateY(-50%) !important;
+  z-index:14;
+}
+.table-player.left-seat .player-menu{
+  left:14px !important;
+  right:auto !important;
+}
+.table-player.right-seat .player-menu{
+  right:14px !important;
+  left:auto !important;
+}
+
+/* Counters remain in their own bottom-right zone and can no longer collide. */
+.table-player .table-bottom{
+  right:14px !important;
+  left:auto !important;
+  bottom:14px !important;
+}
+
+/* Four-player visual order is clockwise:
+   1 top-left → 2 top-right → 3 bottom-right → 4 bottom-left.
+   CSS Grid still fills TL,TR,BL,BR, so visualPlayers swaps slots 3/4. */
+
+@media(max-width:700px){
+  .table-player.left-seat .player-menu{left:8px !important}
+  .table-player.right-seat .player-menu{right:8px !important}
+}
+
+
+/* V0.9.4 — definitive ellipsis corner placement
+   LEFT quadrants: upper-left. RIGHT quadrants: upper-right.
+   These rules intentionally override all older menu positioning. */
+.table-player.left-seat .player-menu,
+.table-player.right-seat .player-menu,
+.table-player:nth-child(odd) .player-menu,
+.table-player:nth-child(even) .player-menu,
+.table-player.opposite-seat:nth-child(odd) .player-menu,
+.table-player.opposite-seat:nth-child(even) .player-menu{
+  top:16px !important;
+  bottom:auto !important;
+  margin:0 !important;
+  transform:none !important;
+  z-index:30 !important;
+}
+.table-player.left-seat .player-menu{
+  left:16px !important;
+  right:auto !important;
+}
+.table-player.right-seat .player-menu{
+  right:16px !important;
+  left:auto !important;
+}
+
+/* Keep counters explicitly in the lower-right area. */
+.table-player .table-bottom{
+  top:auto !important;
+  bottom:14px !important;
+  right:14px !important;
+  left:auto !important;
+}
+
+/* The upper row is rotated as one player-facing surface, so its
+   corner button naturally rotates with the rest of that player's UI. */
+
+@media(max-width:700px){
+  .table-player.left-seat .player-menu{
+    top:10px !important;
+    left:10px !important;
+  }
+  .table-player.right-seat .player-menu{
+    top:10px !important;
+    right:10px !important;
+  }
+}
+
+
+/* V0.9.4 — structural fix, not another positional override */
+
+/* player-menu is now a direct child of .table-player, not .table-bottom */
+.table-player > .player-menu{
+  position:absolute !important;
+  top:14px !important;
+  bottom:auto !important;
+  margin:0 !important;
+  transform:none !important;
+  z-index:40 !important;
+}
+.table-player.left-seat > .player-menu{
+  left:14px !important;
+  right:auto !important;
+}
+.table-player.right-seat > .player-menu{
+  right:14px !important;
+  left:auto !important;
+}
+
+/* The actual modal class in this app is .game-sheet.
+   For opposite/top players, put it at the TOP of the screen and face it 180°. */
+body.sheet-opposite .sheet-backdrop{
+  align-items:flex-start !important;
+}
+body.sheet-opposite .sheet-backdrop .game-sheet{
+  transform:rotate(180deg) !important;
+  transform-origin:center center;
+  border-top:0 !important;
+  border-bottom:3px solid #f05232;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+/* Near/bottom players keep the normal bottom sheet. */
+body:not(.sheet-opposite) .sheet-backdrop .game-sheet{
+  transform:none;
+}
+
+@media(max-width:700px){
+  .table-player.left-seat > .player-menu{top:9px !important;left:9px !important}
+  .table-player.right-seat > .player-menu{top:9px !important;right:9px !important}
+}
+
+
+/* V0.9.4 — top-row outer-edge correction
+   Because opposite-seat is rotated 180°, its local left/right must be swapped
+   to stay on the OUTER physical edge of the table. */
+
+/* Ellipsis:
+   top-left -> physical left edge
+   top-right -> physical right edge */
+.table-player.opposite-seat.left-seat > .player-menu{
+  left:auto !important;
+  right:14px !important;
+}
+.table-player.opposite-seat.right-seat > .player-menu{
+  right:auto !important;
+  left:14px !important;
+}
+
+/* Counters for top players also need mirrored local positioning.
+   This keeps Gift/CMD/Tax on the outer edge from THEIR point of view. */
+.table-player.opposite-seat.left-seat .table-bottom{
+  left:14px !important;
+  right:auto !important;
+}
+.table-player.opposite-seat.right-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+
+/* Bottom row remains unchanged:
+   counters right, ellipsis outer upper corner. */
+
+@media(max-width:700px){
+  .table-player.opposite-seat.left-seat > .player-menu{
+    left:auto !important;
+    right:9px !important;
+  }
+  .table-player.opposite-seat.right-seat > .player-menu{
+    right:auto !important;
+    left:9px !important;
+  }
+  .table-player.opposite-seat.left-seat .table-bottom{
+    left:9px !important;
+    right:auto !important;
+  }
+  .table-player.opposite-seat.right-seat .table-bottom{
+    right:9px !important;
+    left:auto !important;
+  }
+}
+
+
+/* V0.9.4 — all counter sheets obey the player's physical table side */
+body.sheet-opposite .sheet-backdrop{
+  align-items:flex-start !important;
+  justify-content:center;
+}
+body.sheet-opposite .sheet-backdrop .game-sheet{
+  transform:rotate(180deg) !important;
+  transform-origin:center center !important;
+}
+
+
+/* V0.9.4 — ONE orientation rule for every player-owned menu.
+   A menu always faces exactly the same direction as that player's commander image. */
+body.sheet-opposite .sheet-backdrop{
+  align-items:flex-start !important;
+}
+body.sheet-opposite .sheet-backdrop > .game-sheet{
+  transform:rotate(180deg) !important;
+  transform-origin:center center !important;
+}
+body:not(.sheet-opposite) .sheet-backdrop > .game-sheet{
+  transform:none !important;
+}
+
+/* No other sheet/modal child gets an independent rotation. */
+body.sheet-opposite .sheet-backdrop > :not(.game-sheet){
+  transform:none !important;
+}
+
+
+/* V0.9.4 — per-player configurable counters */
+.quick-counters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  justify-content:flex-end;
+}
+.quick-counter{
+  min-width:58px;
+}
+.counter-settings-note{
+  margin:14px 0 12px;
+  color:#aaa;
+  line-height:1.4;
+}
+.counter-picker-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.counter-choice{
+  min-height:62px;
+  border:1px solid #444;
+  background:#222;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.counter-choice.selected{
+  border-color:var(--player-color,#ef482b);
+}
+.counter-choice-check{
+  width:28px;
+  height:28px;
+  border:1px solid #555;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  font-weight:1000;
+}
+.counter-choice.selected .counter-choice-check{
+  color:var(--player-color,#ef482b);
+  border-color:var(--player-color,#ef482b);
+}
+.counter-choice b,.counter-choice small{display:block}
+.counter-choice small{
+  margin-top:3px;
+  color:#999;
+  font-size:10px;
+  letter-spacing:.08em;
+}
+@media(max-width:700px){
+  .counter-picker-grid{grid-template-columns:1fr 1fr}
+  .quick-counter{min-width:52px;padding-left:7px;padding-right:7px}
+}
+
+
+/* V0.9.4 — explicit physical counter placement */
+.table-player.near-seat.left-seat .table-bottom,
+.table-player.near-seat.right-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+.table-player.opposite-seat.left-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+.table-player.opposite-seat.right-seat .table-bottom{
+  left:14px !important;
+  right:auto !important;
+}
+
+/* Center utility sheet */
+.dice-tools{
+  display:grid;
+  gap:16px;
+}
+.dice-type-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+}
+.dice-type{
+  min-height:48px;
+  border:1px solid #444;
+  background:#222;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.dice-type.selected{
+  border-color:#ef482b;
+  color:#ef482b;
+}
+.dice-count-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.dice-count-row button{
+  width:52px;height:46px;border:1px solid #444;background:#222;color:#fff;
+  font-size:22px;font-weight:900;
+}
+.dice-count{
+  min-width:52px;text-align:center;font-size:28px;font-weight:1000;
+}
+.dice-roll-button,.coin-button{
+  min-height:54px;border:1px solid #555;background:#252525;color:#fff;
+  font:inherit;font-weight:1000;cursor:pointer;
+}
+.dice-result{
+  min-height:92px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  border:1px solid #333;
+  background:#111;
+  padding:12px;
+}
+.dice-result-main{font-size:48px;font-weight:1000;line-height:1}
+.dice-result-detail{margin-top:8px;color:#aaa;font-size:12px}
+@media(max-width:700px){
+  .table-player.near-seat.left-seat .table-bottom,
+  .table-player.near-seat.right-seat .table-bottom,
+  .table-player.opposite-seat.left-seat .table-bottom{right:9px !important;left:auto !important}
+  .table-player.opposite-seat.right-seat .table-bottom{left:9px !important;right:auto !important}
+  .dice-type-grid{grid-template-columns:repeat(4,1fr)}
+}
+
+
+/* V0.9.4 — top row final physical layout
+   The entire top row is rotated 180deg, so local left/right is inverted.
+
+   Physical top-left:
+   - name must end up on physical outer-left
+   - counters on physical outer-right
+
+   Physical top-right:
+   - name must end up on physical outer-right
+   - counters on physical outer-left
+*/
+
+/* TOP-LEFT quadrant: local LEFT becomes physical RIGHT after rotation */
+.table-player.opposite-seat.left-seat .table-bottom{
+  left:14px !important;
+  right:auto !important;
+}
+
+/* TOP-RIGHT quadrant: local RIGHT becomes physical LEFT after rotation */
+.table-player.opposite-seat.right-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+
+/* Bottom row unchanged */
+.table-player.near-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+
+@media(max-width:700px){
+  .table-player.opposite-seat.left-seat .table-bottom{
+    left:9px !important;
+    right:auto !important;
+  }
+  .table-player.opposite-seat.right-seat .table-bottom{
+    right:9px !important;
+    left:auto !important;
+  }
+  .table-player.near-seat .table-bottom{
+    right:9px !important;
+    left:auto !important;
+  }
+}
+
+
+/* V0.9.4 — definitive counter anchor.
+   Both top quadrants are rotated 180deg.
+   Therefore local RIGHT = physical LEFT.
+   This gives both upper players the same layout from their own perspective:
+   name on their left, counters on their right. */
+.table-player.opposite-seat.left-seat .table-bottom,
+.table-player.opposite-seat.right-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+
+/* Bottom players: local RIGHT is physical RIGHT. */
+.table-player.near-seat.left-seat .table-bottom,
+.table-player.near-seat.right-seat .table-bottom{
+  right:14px !important;
+  left:auto !important;
+}
+
+@media(max-width:700px){
+  .table-player.opposite-seat.left-seat .table-bottom,
+  .table-player.opposite-seat.right-seat .table-bottom,
+  .table-player.near-seat.left-seat .table-bottom,
+  .table-player.near-seat.right-seat .table-bottom{
+    right:9px !important;
+    left:auto !important;
+  }
+}
+
+
+/* V0.9.4 — full-table physical 3D dice */
+.dice3d-overlay{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:none;
+  overflow:hidden;
+  background:rgba(0,0,0,.16);
+  touch-action:none;
+}
+.dice3d-overlay.open{display:block}
+.dice3d-stage{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+.dice3d-stage canvas{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  pointer-events:none;
+}
+.dice3d-topbar{
+  position:absolute;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:3;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(12,12,12,.88);
+  backdrop-filter:blur(10px);
+}
+.dice3d-picker{display:flex;gap:5px}
+.dice3d-picker button,.dice3d-count button{
+  min-width:46px;height:42px;
+  border:1px solid #555;
+  background:#181818;color:#fff;
+  font-weight:1000;
+}
+.dice3d-picker button.active{
+  border-color:#ef482b;color:#ef482b;
+}
+.dice3d-count{display:flex;align-items:center;gap:7px}
+.dice3d-count strong{min-width:30px;text-align:center}
+.dice3d-hint{
+  position:absolute;
+  left:50%;top:84px;
+  transform:translateX(-50%);
+  z-index:3;
+  font-size:10px;font-weight:1000;letter-spacing:.12em;
+  color:rgba(255,255,255,.72);
+  text-shadow:0 1px 5px #000;
+  white-space:nowrap;
+}
+.dice3d-result{
+  position:absolute;
+  left:50%;bottom:88px;
+  transform:translateX(-50%);
+  z-index:3;
+  min-width:160px;
+  text-align:center;
+  font-size:42px;font-weight:1000;
+  color:#fff;
+  text-shadow:0 2px 12px #000;
+}
+.dice3d-result small{
+  display:block;margin-top:5px;
+  font-size:11px;letter-spacing:.08em;color:#ccc;
+}
+.dice3d-actions{
+  position:absolute;
+  z-index:3;
+  bottom:18px;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:8px;
+}
+.dice3d-actions button{
+  height:52px;padding:0 22px;
+  border:1px solid #666;background:rgba(15,15,15,.92);
+  color:#fff;font-weight:1000;
+}
+.dice3d-actions .dice3d-roll{
+  border-color:#ef482b;color:#ef482b;
+}
+@media(max-width:800px){
+  .dice3d-topbar{top:8px;max-width:calc(100vw - 16px);overflow-x:auto}
+  .dice3d-picker button,.dice3d-count button{min-width:40px;height:38px}
+  .dice3d-hint{top:66px}
+  .dice3d-result{bottom:76px;font-size:34px}
+  .dice3d-actions{bottom:10px}
+  .dice3d-actions button{height:46px;padding:0 16px}
+}
+
+
+/* V0.9.4 — dice colors */
+.dice3d-colors{
+  display:flex;gap:5px;align-items:center;
+  padding-left:8px;border-left:1px solid #444;
+}
+.dice3d-color{
+  width:25px!important;height:25px!important;min-width:25px!important;
+  padding:0!important;border-radius:50%!important;
+  background:var(--c)!important;border:2px solid #555!important;
+}
+.dice3d-color.active{
+  border-color:#fff!important;
+  box-shadow:0 0 0 2px #ef482b;
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
 <link rel="apple-touch-icon" href="./assets/commander-icon-192.png">
+
+<script src="https://cdn.jsdelivr.net/gh/sarahRosannaBusch/dice@main/libs/three.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/gh/sarahRosannaBusch/dice@main/libs/cannon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/sarahRosannaBusch/dice@main/libs/teal.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/sarahRosannaBusch/dice@main/dice.js"></script>
+
 </head>
 <body>
+
+<div id="dice3dOverlay" class="dice3d-overlay" aria-hidden="true">
+  <div id="dice3dStage" class="dice3d-stage"></div>
+  <div class="dice3d-topbar">
+    <div class="dice3d-picker" id="dice3dPicker"></div>
+    <div class="dice3d-count">
+      <button onclick="change3dDiceCount(-1)">−</button>
+      <strong id="dice3dCountLabel">1×</strong>
+      <button onclick="change3dDiceCount(1)">+</button>
+    </div>
+    <div class="dice3d-colors" id="dice3dColors">
+      <button class="dice3d-color active" style="--c:#202020" onclick="setDiceVisualColor('black',this)" title="Schwarz"></button>
+      <button class="dice3d-color" style="--c:#b91c1c" onclick="setDiceVisualColor('red',this)" title="Rot"></button>
+      <button class="dice3d-color" style="--c:#2563eb" onclick="setDiceVisualColor('blue',this)" title="Blau"></button>
+      <button class="dice3d-color" style="--c:#16a34a" onclick="setDiceVisualColor('green',this)" title="Grün"></button>
+      <button class="dice3d-color" style="--c:#7c3aed" onclick="setDiceVisualColor('purple',this)" title="Violett"></button>
+      <button class="dice3d-color" style="--c:#d97706" onclick="setDiceVisualColor('gold',this)" title="Gold"></button>
+    </div>
+  </div>
+  <div class="dice3d-hint" id="dice3dHint">WISCH ÜBER DEN TISCH ODER TIPPE AUF WÜRFELN</div>
+  <div class="dice3d-result" id="dice3dResult"></div>
+  <div class="dice3d-actions">
+    <button class="dice3d-roll" onclick="throw3dDice()">🎲 WÜRFELN</button>
+    <button onclick="close3dDice()">SCHLIESSEN</button>
+  </div>
+</div>
+
 <div class="app">
 <header class="mast">
   <div class="brand">
@@ -1260,7 +1831,7 @@ body.cmd-mode .player-menu{opacity:0;pointer-events:none}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.9</div></header>
+<div class="version-label">V0.9.4</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1367,6 +1938,7 @@ const gameSelection={};
 let liveGame=null;
 let commanderDamageTargetId=null;
 let sheetSeatPlayerId=null;
+let pendingCounterSeatId=null;
 const lifeChangeDisplay={};
 const lifeChangeTimers={};
 let gameTimerHandle=null;
@@ -1548,7 +2120,7 @@ function startGame(){
   liveGame={
     id:uid('g'),startedAt:new Date().toISOString(),turn:1,activeIndex:startIndex,
     events:[],eliminationOrder:[],
-    players:selected.map((p,i)=>({playerId:p.id,name:p.name,avatar:p.avatar||null,commander:gameSelection[p.id].commander,playerColor:['#22d3c5','#f2c94c','#f28c38','#a879e8','#55a7ff','#69c779'][i%6],life:40,poison:0,commanderTax:0,eliminated:false,commanderDamage:{}}))
+    players:selected.map((p,i)=>({playerId:p.id,name:p.name,avatar:p.avatar||null,commander:gameSelection[p.id].commander,playerColor:['#22d3c5','#f2c94c','#f28c38','#a879e8','#55a7ff','#69c779'][i%6],life:40,poison:0,commanderTax:0,customCounters:{charge:0,energy:0,experience:0,rad:0},enabledCounters:['commanderDamage','commanderTax'],eliminated:false,commanderDamage:{}}))
   };
   liveGame.players.forEach(target=>liveGame.players.forEach(source=>{if(source.playerId!==target.playerId)target.commanderDamage[source.playerId]=0}));
   addEvent('game_start',null,{startPlayerId:liveGame.players[startIndex].playerId},`Partie gestartet · ${liveGame.players[startIndex].name} beginnt`);
@@ -1564,7 +2136,104 @@ function addEvent(type,playerId,data={},label=''){
   if(!liveGame)return;
   liveGame.events.push({id:uid('ev'),at:new Date().toISOString(),turn:liveGame.turn,activePlayerId:liveGame.players[liveGame.activeIndex]?.playerId||null,type,playerId,data,label});
 }
+
+const PLAYER_COUNTERS=[
+  {key:'commanderDamage',label:'CMD',name:'Commander Damage',kind:'commander'},
+  {key:'commanderTax',label:'TAX',name:'Commander Tax',kind:'tax'},
+  {key:'poison',label:'GIFT',name:'Gift',kind:'number'},
+  {key:'charge',label:'CHARGE',name:'Charge',kind:'custom'},
+  {key:'energy',label:'ENERGIE',name:'Energie',kind:'custom'},
+  {key:'experience',label:'ERF',name:'Erfahrung',kind:'custom'},
+  {key:'rad',label:'RAD',name:'Rad',kind:'custom'}
+];
+
+function ensurePlayerCounterSettings(p){
+  if(!p.enabledCounters) p.enabledCounters=['commanderDamage','commanderTax'];
+  if(!p.customCounters) p.customCounters={charge:0,energy:0,experience:0,rad:0};
+  for(const key of ['charge','energy','experience','rad']){
+    if(typeof p.customCounters[key]!=='number')p.customCounters[key]=0;
+  }
+  if(typeof p.poison!=='number')p.poison=0;
+  if(typeof p.commanderTax!=='number')p.commanderTax=0;
+}
+
+function counterValue(p,key){
+  if(key==='commanderDamage')return Math.max(0,...Object.values(p.commanderDamage||{}));
+  if(key==='commanderTax')return p.commanderTax||0;
+  if(key==='poison')return p.poison||0;
+  return p.customCounters?.[key]||0;
+}
+
+function renderQuickCounters(p){
+  ensurePlayerCounterSettings(p);
+  return p.enabledCounters.map(key=>{
+    const def=PLAYER_COUNTERS.find(x=>x.key===key);
+    if(!def)return '';
+    const value=counterValue(p,key);
+    if(def.kind==='commander'){
+      return `<button class="quick-counter" onclick="enterCommanderDamageMode('${p.playerId}')">${def.label} <b>${value}</b></button>`;
+    }
+    return `<button class="quick-counter" onclick="openCounterSheet('${p.playerId}','${key}')">${def.label} <b>${value}</b></button>`;
+  }).join('');
+}
+
+
+let diceSides=20;
+let diceCount=1;
+let diceLastResult=null;
+
+function openTableTools(){
+  const diceButtons=[4,6,8,10,12,20,100].map(s=>
+    `<button class="dice-type ${diceSides===s?'selected':''}" onclick="diceSides=${s};openTableTools()">d${s}</button>`
+  ).join('');
+  const result=diceLastResult
+    ? `<div><div class="dice-result-main">${diceLastResult.main}</div><div class="dice-result-detail">${diceLastResult.detail}</div></div>`
+    : `<div class="dice-result-detail">Noch nicht gewürfelt</div>`;
+
+  makeSheet('Tisch-Tools','Würfel & Münze',`
+    <div class="dice-tools">
+      <div class="dice-type-grid">${diceButtons}</div>
+      <div class="dice-count-row">
+        <button onclick="diceCount=Math.max(1,diceCount-1);openTableTools()">−</button>
+        <div class="dice-count">${diceCount}×</div>
+        <button onclick="diceCount=Math.min(20,diceCount+1);openTableTools()">+</button>
+      </div>
+      <button class="dice-roll-button" onclick="rollTableDice()">🎲 ${diceCount}× d${diceSides} würfeln</button>
+      <button class="coin-button" onclick="flipTableCoin()">Münze werfen</button>
+      <div class="dice-result">${result}</div>
+    </div>
+  `);
+}
+
+
+function openTableDiceTools(){
+  openTableTools();
+}
+
+function flipFromPartyMenu(){
+  const side=Math.random()<.5?'Kopf':'Zahl';
+  diceLastResult={main:side,detail:'Münzwurf'};
+  openTableTools();
+}
+
+function rollTableDice(){
+  const rolls=Array.from({length:diceCount},()=>Math.floor(Math.random()*diceSides)+1);
+  const sum=rolls.reduce((a,b)=>a+b,0);
+  diceLastResult={
+    main:diceCount===1?String(rolls[0]):String(sum),
+    detail:diceCount===1?`d${diceSides}`:`${rolls.join(' + ')} · Summe ${sum}`
+  };
+  openTableTools();
+}
+
+function flipTableCoin(){
+  const side=Math.random()<.5?'Kopf':'Zahl';
+  diceLastResult={main:side,detail:'Münzwurf'};
+  openTableTools();
+}
+
 function renderLiveGame(){
+  liveGame?.players?.forEach(ensurePlayerCounterSettings);
   if(!liveGame)return;
   const active=liveGame.players[liveGame.activeIndex];
   const grid=document.getElementById('tableGrid');
@@ -1574,10 +2243,14 @@ function renderLiveGame(){
   document.getElementById('turnLabel').textContent=`Zug ${liveGame.turn} · ${active?.name||''}`;
   const timer=document.getElementById('gameTimer');if(timer)timer.textContent=formatTime(elapsedSeconds());
   const ub=document.getElementById('undoBtn');if(ub)ub.disabled=!liveGame.events.some(e=>e.data?.before);
-  grid.innerHTML=liveGame.players.map((gp,i)=>{
+  const visualPlayers = liveGame.players.length===4
+    ? [liveGame.players[0],liveGame.players[1],liveGame.players[3],liveGame.players[2]]
+    : liveGame.players;
+  grid.innerHTML=visualPlayers.map((gp,visualIndex)=>{
+    const i=liveGame.players.findIndex(p=>p.playerId===gp.playerId);
     const art=gp.commander.art||gp.commander.image||'';
     const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
-    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${i<Math.ceil(liveGame.players.length/2)?'opposite-seat':'near-seat'} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}');--player-color:${gp.playerColor||'#ef482b'}">
+    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${i<Math.ceil(liveGame.players.length/2)?'opposite-seat':'near-seat'} ${visualIndex%2===0?'left-seat':'right-seat'} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}');--player-color:${gp.playerColor||'#ef482b'}">
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
       <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
       <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
@@ -1586,12 +2259,10 @@ function renderLiveGame(){
       <div class="life-hint">− &nbsp;&nbsp; Leben &nbsp;&nbsp; +</div>
       <div class="table-bottom">
         <div class="quick-counters">
-          <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','poison')">GIFT <b>${gp.poison}</b></button>
-          <button class="quick-counter" onclick="enterCommanderDamageMode('${gp.playerId}')">CMD <b>${totalCmd}</b></button>
-          <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','commanderTax')">TAX <b>${gp.commanderTax}</b></button>
+          ${renderQuickCounters(gp)}
         </div>
-        <button class="player-menu" onclick="openPlayerSheet('${gp.playerId}')">•••</button>
       </div>
+      <button class="player-menu" onclick="openPlayerSheet('${gp.playerId}')">•••</button>
       ${commanderDamageTargetId ? commanderDamageOverlay(gp) : ''}
     </article>`
   }).join('');
@@ -1604,7 +2275,7 @@ function dangerReason(p){
   if(Object.values(p.commanderDamage||{}).some(x=>x>=21))return '21 Commander';
   return '';
 }
-function snapshotPlayer(p){return JSON.parse(JSON.stringify({life:p.life,poison:p.poison,commanderTax:p.commanderTax,eliminated:p.eliminated,commanderDamage:p.commanderDamage}))}
+function snapshotPlayer(p){ensurePlayerCounterSettings(p);return JSON.parse(JSON.stringify({life:p.life,poison:p.poison,commanderTax:p.commanderTax,customCounters:p.customCounters,enabledCounters:p.enabledCounters,eliminated:p.eliminated,commanderDamage:p.commanderDamage}))}
 function changeLife(id,n){
   const p=getLivePlayer(id);if(!p)return;const before=snapshotPlayer(p);p.life+=n;
   addEvent('life',id,{delta:n,before,after:snapshotPlayer(p)},`${p.name}: Leben ${n>0?'+':''}${n} → ${p.life}`);
@@ -1616,9 +2287,18 @@ function showLifeChange(id,n){
   lifeChangeTimers[id]=setTimeout(()=>{delete lifeChangeDisplay[id];delete lifeChangeTimers[id];if(liveGame)renderLiveGame()},2200);
 }
 function changeCounter(id,key,n){
-  const p=getLivePlayer(id);if(!p)return;const before=snapshotPlayer(p);p[key]=Math.max(0,(p[key]||0)+n);
-  const label=key==='poison'?'Gift':'Commander Tax';
-  addEvent(key,id,{delta:n,before,after:snapshotPlayer(p)},`${p.name}: ${label} ${n>0?'+':''}${n} → ${p[key]}`);
+  const p=getLivePlayer(id);if(!p)return;
+  ensurePlayerCounterSettings(p);
+  const before=snapshotPlayer(p);
+  const def=PLAYER_COUNTERS.find(x=>x.key===key);
+  if(!def||def.kind==='commander')return;
+
+  if(key==='commanderTax')p.commanderTax=Math.max(0,(p.commanderTax||0)+n);
+  else if(key==='poison')p.poison=Math.max(0,(p.poison||0)+n);
+  else p.customCounters[key]=Math.max(0,(p.customCounters[key]||0)+n);
+
+  const value=counterValue(p,key);
+  addEvent('counter',id,{key,delta:n,before,after:snapshotPlayer(p)},`${p.name}: ${def.name} ${n>0?'+':''}${n} → ${value}`);
   renderLiveGame();
 }
 function changeCommanderDamage(targetId,sourceId,n){
@@ -1748,19 +2428,77 @@ function makeSheet(title,subtitle,body){
   document.body.appendChild(wrap);
 }
 function openCounterSheet(id,key){
-  const p=getLivePlayer(id);if(!p)return;const label=key==='poison'?'Gift':'Commander Tax',step=key==='commanderTax'?2:1;
-  makeSheet(label,p.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeCounter('${id}','${key}',-${step});openCounterSheet('${id}','${key}')">− ${step}</button><button class="sheet-action" onclick="changeCounter('${id}','${key}',${step});openCounterSheet('${id}','${key}')">+ ${step}</button></div><div style="font-size:72px;font-weight:1000;text-align:center">${p[key]}</div>`);
+  const p=getLivePlayer(id);if(!p)return;
+  ensurePlayerCounterSettings(p);
+  const def=PLAYER_COUNTERS.find(x=>x.key===key);
+  if(!def||def.kind==='commander')return;
+  const step=key==='commanderTax'?2:1;
+  const value=counterValue(p,key);
+
+  makeSheet(
+    def.name,
+    p.name,
+    `<div class="sheet-grid">
+      <button class="sheet-action" onclick="changeCounter('${id}','${key}',-${step});openCounterSheet('${id}','${key}')">− ${step}</button>
+      <button class="sheet-action" onclick="changeCounter('${id}','${key}',${step});openCounterSheet('${id}','${key}')">+ ${step}</button>
+    </div>
+    <div style="font-size:72px;font-weight:1000;text-align:center">${value}</div>`
+  );
+  applySheetSeatOrientation(id);
 }
+
 function openCommanderDamageSheet(id){
   const p=getLivePlayer(id);if(!p)return;
   const rows=liveGame.players.filter(x=>x.playerId!==id).map(src=>`<div class="damage-sheet-row"><div><b>${esc(src.name)}</b><div class="muted">${esc(src.commander.name)}</div></div><div class="damage-sheet-controls"><button onclick="changeCommanderDamage('${id}','${src.playerId}',-1);openCommanderDamageSheet('${id}')">−</button><b>${p.commanderDamage[src.playerId]||0}</b><button onclick="changeCommanderDamage('${id}','${src.playerId}',1);openCommanderDamageSheet('${id}')">+</button></div></div>`).join('');
   makeSheet('Commander-Schaden',p.name,`<div style="margin-top:14px">${rows}</div>`);
 }
-function openPlayerSheet(id){
+
+function playerFacesTop(id){
+  if(!liveGame)return false;
+  const playerIndex=liveGame.players.findIndex(x=>x.playerId===id);
+  return playerIndex>=0 && playerIndex<Math.ceil(liveGame.players.length/2);
+}
+
+function applySheetSeatOrientation(id){
+  const facesTop=playerFacesTop(id);
   sheetSeatPlayerId=id;
-  document.body.classList.toggle('sheet-opposite',!!getLivePlayer(id)&&liveGame.players.indexOf(getLivePlayer(id))<Math.ceil(liveGame.players.length/2));
+  document.body.classList.toggle('sheet-opposite',facesTop);
+}
+
+function openPlayerSheet(id){
   const p=getLivePlayer(id);if(!p)return;
-  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action" onclick="openPlayerColorSheet('${id}')">Farbe ändern</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
+  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action" onclick="openPlayerColorSheet('${id}')">Farbe ändern</button><button class="sheet-action" onclick="openPlayerCounterSettings('${id}')">Counter anpassen</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
+  applySheetSeatOrientation(id);
+}
+
+
+function openPlayerCounterSettings(id){
+  const p=getLivePlayer(id);if(!p)return;
+  ensurePlayerCounterSettings(p);
+  const choices=PLAYER_COUNTERS.map(def=>{
+    const active=p.enabledCounters.includes(def.key);
+    return `<button class="counter-choice ${active?'selected':''}" onclick="togglePlayerCounter('${id}','${def.key}')">
+      <span class="counter-choice-check">${active?'✓':'+'}</span>
+      <span><b>${def.name}</b><small>${def.label}</small></span>
+    </button>`;
+  }).join('');
+  makeSheet('Counter anpassen',p.name,`
+    <div class="counter-settings-note">Wähle nur die Counter, die du in dieser Partie brauchst.</div>
+    <div class="counter-picker-grid">${choices}</div>
+  `);
+  applySheetSeatOrientation(id);
+}
+
+function togglePlayerCounter(id,key){
+  const p=getLivePlayer(id);if(!p)return;
+  ensurePlayerCounterSettings(p);
+  if(p.enabledCounters.includes(key)){
+    p.enabledCounters=p.enabledCounters.filter(x=>x!==key);
+  }else{
+    p.enabledCounters.push(key);
+  }
+  renderLiveGame();
+  openPlayerCounterSettings(id);
 }
 
 const PLAYER_COLORS=[
@@ -1775,6 +2513,7 @@ function openPlayerColorSheet(id){
   const p=getLivePlayer(id);if(!p)return;
   const choices=PLAYER_COLORS.map(c=>`<button class="color-choice ${p.playerColor===c.value?'selected':''}" style="--choice-color:${c.value}" onclick="setPlayerColor('${id}','${c.value}')"><span class="color-swatch"></span>${c.name}</button>`).join('');
   makeSheet('Farbe ändern',p.name,`<div class="color-picker-grid">${choices}</div>`);
+  applySheetSeatOrientation(id);
 }
 function setPlayerColor(id,color){
   const p=getLivePlayer(id);if(!p)return;
@@ -1785,7 +2524,9 @@ function setPlayerColor(id,color){
 }
 
 function openGameMenu(){
-  makeSheet('Partie',`Zug ${liveGame.turn} · ${formatTime(elapsedSeconds())}`,`<div class="sheet-grid"><button class="sheet-action" onclick="undoLastAction();closeSheet()">↶ Rückgängig</button><button class="sheet-action" onclick="nextTurn();closeSheet()">Nächster Zug →</button><button class="sheet-action" onclick="showEventLogSheet()">Partieprotokoll</button><button class="sheet-action danger" onclick="closeSheet();finishGame()">Partie beenden</button></div>`);
+  makeSheet('Partie',`Zug ${liveGame.turn} · ${formatTime(elapsedSeconds())}`,`<div class="sheet-grid"><button class="sheet-action" onclick="undoLastAction();closeSheet()">↶ Rückgängig</button><button class="sheet-action" onclick="nextTurn();closeSheet()">Nächster Zug →</button><button class="sheet-action" onclick="showEventLogSheet()">Partieprotokoll</button>
+        <button class="sheet-action" onclick="open3dDice()">🎲 3D-Würfel</button>
+        <button class="sheet-action" onclick="flipFromPartyMenu()">🪙 Münzwurf</button><button class="sheet-action danger" onclick="closeSheet();finishGame()">Partie beenden</button></div>`);
 }
 function showEventLogSheet(){
   const rows=liveGame.events.slice().reverse().map(ev=>`<div class="damage-sheet-row"><div class="muted">Zug ${ev.turn}</div><div>${esc(ev.label||ev.type)}</div></div>`).join('');
@@ -1857,11 +2598,190 @@ function renderAll(){
   renderGameSetup();
 }
 renderAll();
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.turn-menu,.turn-more,.center-menu,.turn-control .more,.turn-pill .more');
+  if(!b)return;
+  e.preventDefault();
+  openTableTools();
+});
+
 </script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
+
+/* V0.9.4 — Sarah Rosanna Busch / dice 3D integration */
+let dice3dBox=null;
+let dice3dSides=20;
+let dice3dCount=1;
+let dice3dSwipeBound=false;
+const dice3dTypes=[4,6,8,10,12,20,100];
+
+
+function get3dDiceNotation(){
+  // Percentile dice: one tens die (00–90) plus one ones die (0–9)
+  // for EACH requested d100 roll.
+  if(dice3dSides===100){
+    return Array.from({length:dice3dCount},()=>`1d100+1d9`).join('+');
+  }
+  return `${dice3dCount}d${dice3dSides}`;
+}
+
+let diceVisualColor='black';
+const diceColorFilters={
+  black:'none',
+  red:'sepia(1) saturate(7) hue-rotate(330deg) brightness(.85)',
+  blue:'sepia(1) saturate(7) hue-rotate(175deg) brightness(.9)',
+  green:'sepia(1) saturate(6) hue-rotate(75deg) brightness(.9)',
+  purple:'sepia(1) saturate(7) hue-rotate(225deg) brightness(.9)',
+  gold:'sepia(1) saturate(7) hue-rotate(355deg) brightness(1.15)'
+};
+function setDiceVisualColor(name,button){
+  diceVisualColor=name;
+  document.querySelectorAll('.dice3d-color').forEach(b=>b.classList.remove('active'));
+  if(button)button.classList.add('active');
+  applyDiceVisualColor();
+}
+function applyDiceVisualColor(){
+  const canvas=document.querySelector('#dice3dStage canvas');
+  if(canvas)canvas.style.filter=diceColorFilters[diceVisualColor]||'none';
+}
+
+/* Lightweight local roll sound. This avoids the upstream relative MP3 path,
+   which does not resolve correctly when dice.js itself is loaded from a CDN. */
+let diceAudioCtx=null;
+function playDiceRollSound(){
+  try{
+    diceAudioCtx=diceAudioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    if(diceAudioCtx.state==='suspended')diceAudioCtx.resume();
+    const now=diceAudioCtx.currentTime;
+    for(let i=0;i<11;i++){
+      const t=now+i*.045+Math.random()*.018;
+      const osc=diceAudioCtx.createOscillator();
+      const gain=diceAudioCtx.createGain();
+      osc.type='triangle';
+      osc.frequency.setValueAtTime(90+Math.random()*170,t);
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.exponentialRampToValueAtTime(.035+Math.random()*.035,t+.006);
+      gain.gain.exponentialRampToValueAtTime(.0001,t+.055);
+      osc.connect(gain); gain.connect(diceAudioCtx.destination);
+      osc.start(t); osc.stop(t+.065);
+    }
+  }catch(e){}
+}
+
+function render3dDicePicker(){
+  const picker=document.getElementById('dice3dPicker');
+  if(!picker)return;
+  picker.innerHTML=dice3dTypes.map(s=>
+    `<button class="${s===dice3dSides?'active':''}" onclick="set3dDiceType(${s})">d${s}</button>`
+  ).join('');
+  document.getElementById('dice3dCountLabel').textContent=`${dice3dCount}×`;
+}
+
+function set3dDiceType(s){
+  dice3dSides=s;
+  render3dDicePicker();
+  if(dice3dBox)dice3dBox.setDice(get3dDiceNotation());
+}
+
+function change3dDiceCount(delta){
+  dice3dCount=Math.max(1,Math.min(10,dice3dCount+delta));
+  render3dDicePicker();
+  if(dice3dBox)dice3dBox.setDice(get3dDiceNotation());
+}
+
+function ensure3dDice(){
+  const stage=document.getElementById('dice3dStage');
+  if(!stage)return false;
+  if(typeof DICE==='undefined'){
+    document.getElementById('dice3dResult').innerHTML=
+      `<small>3D-Würfel konnten nicht geladen werden.</small>`;
+    return false;
+  }
+  if(!dice3dBox){
+    dice3dBox=new DICE.dice_box(stage);
+    dice3dBox.setDice(get3dDiceNotation());
+  }else{
+    dice3dBox.reinit(stage);
+    dice3dBox.setDice(get3dDiceNotation());
+  }
+  if(!dice3dSwipeBound){
+    dice3dBox.bind_swipe(
+      document.getElementById('dice3dOverlay'),
+      function(){ playDiceRollSound(); return null; },
+      show3dDiceResult
+    );
+    dice3dSwipeBound=true;
+  }
+  applyDiceVisualColor();
+  return true;
+}
+
+function open3dDice(){
+  closeSheet();
+  if(typeof DICE==='undefined'){
+    alert('Die 3D-Würfelbibliothek konnte nicht geladen werden. Bitte Seite neu laden.');
+    return;
+  }
+  const overlay=document.getElementById('dice3dOverlay');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.getElementById('dice3dResult').innerHTML='';
+  render3dDicePicker();
+  requestAnimationFrame(()=>requestAnimationFrame(ensure3dDice));
+}
+
+function close3dDice(){
+  const overlay=document.getElementById('dice3dOverlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  if(dice3dBox)dice3dBox.clear();
+}
+
+function throw3dDice(){
+  if(!ensure3dDice())return;
+  playDiceRollSound();
+  dice3dBox.setDice(get3dDiceNotation());
+  document.getElementById('dice3dResult').innerHTML='';
+  dice3dBox.start_throw(null,show3dDiceResult);
+}
+
+function show3dDiceResult(notation){
+  if(!notation)return;
+  const result=document.getElementById('dice3dResult');
+  const rolls=notation.result||[];
+
+  if(dice3dSides===100){
+    const values=[];
+    for(let i=0;i<rolls.length;i+=2){
+      const tens=Number(rolls[i]||0);
+      let ones=Number(rolls[i+1]||0);
+      // d9 in this library is the 0–9 companion die.
+      const value=(tens===0 && ones===0)?100:tens+ones;
+      values.push(value);
+    }
+    const total=values.reduce((a,b)=>a+b,0);
+    result.innerHTML=`${dice3dCount===1?values[0]:total}
+      <small>${dice3dCount===1
+        ? `${String(rolls[0]||0).padStart(2,'0')} + ${rolls[1]||0}`
+        : `${values.join(' + ')} · Summe ${total}`}</small>`;
+    return;
+  }
+
+  result.innerHTML=`${notation.resultTotal ?? ''}
+    <small>${rolls.length>1 ? rolls.join(' + ') : `d${dice3dSides}`}</small>`;
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('dice3dOverlay')?.classList.contains('open') && dice3dBox){
+    dice3dBox.reinit(document.getElementById('dice3dStage'));
+  }
+});
+
+
 </script>
 </body>
 </html>
