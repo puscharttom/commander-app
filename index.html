@@ -718,6 +718,155 @@ label{
 .placement-row{display:grid;grid-template-columns:50px 1fr 150px;gap:10px;align-items:center;padding:10px;border:1px solid var(--line)}
 @media(max-width:600px){.placement-row{grid-template-columns:42px 1fr}.placement-row select{grid-column:1/-1}}
 
+
+/* V0.7 — fullscreen Commander table */
+body.game-running{overflow:hidden;background:#090909}
+body.game-running .mast,
+body.game-running .nav,
+body.game-running #gameSetupView{display:none!important}
+body.game-running .app{width:100%;max-width:none;padding:0;margin:0}
+body.game-running main,
+body.game-running #game.view{padding:0;margin:0}
+body.game-running #game{display:block!important}
+.table-mode{
+  position:fixed;
+  inset:0;
+  z-index:150;
+  background:#080808;
+  color:#fff;
+}
+.table-mode .table-grid{
+  width:100%;
+  height:100%;
+  display:grid;
+  gap:2px;
+  border:0;
+  background:#080808;
+}
+.table-mode .table-grid.players-2{grid-template-columns:1fr 1fr}
+.table-mode .table-grid.players-3,
+.table-mode .table-grid.players-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.table-mode .table-grid.players-5,
+.table-mode .table-grid.players-6{grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr}
+.table-player{
+  position:relative;
+  min-height:0;
+  overflow:hidden;
+  isolation:isolate;
+  border:0;
+  background:#171717;
+  color:#fff;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+.table-player:before{
+  content:"";
+  position:absolute;inset:0;z-index:-3;
+  background-image:var(--commander-art);
+  background-size:cover;
+  background-position:center 25%;
+  transform:scale(1.025);
+}
+.table-player:after{
+  content:"";
+  position:absolute;inset:0;z-index:-2;
+  background:linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.48) 45%,rgba(0,0,0,.78));
+}
+.table-player.active-turn{box-shadow:inset 0 0 0 4px #f05232}
+.table-player.eliminated:after{background:rgba(0,0,0,.82)}
+.table-top{
+  position:absolute;top:16px;left:18px;right:18px;z-index:5;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  pointer-events:none;
+  text-shadow:0 2px 8px #000;
+}
+.table-name{font-size:clamp(16px,2vw,24px);font-weight:1000;text-transform:uppercase;letter-spacing:-.025em}
+.table-commander{margin-top:2px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:800;opacity:.82}
+.turn-dot{width:11px;height:11px;border-radius:50%;background:#f05232;box-shadow:0 0 16px #f05232}
+.life-tap{
+  position:absolute;inset:0;z-index:1;display:grid;grid-template-columns:1fr 1fr;
+}
+.life-zone{border:0;background:transparent;cursor:pointer;color:transparent}
+.life-zone:active{background:rgba(255,255,255,.06)}
+.life-display{
+  position:absolute;left:50%;top:47%;z-index:3;
+  transform:translate(-50%,-50%);
+  font-size:clamp(76px,11vw,150px);line-height:.8;font-weight:1000;letter-spacing:-.08em;
+  text-shadow:0 5px 28px rgba(0,0,0,.8);
+  pointer-events:none;
+}
+.life-hint{
+  position:absolute;left:50%;top:63%;z-index:3;transform:translateX(-50%);
+  font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;opacity:.6;
+  pointer-events:none;
+}
+.table-bottom{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:6;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:8px;
+}
+.quick-counters{display:flex;gap:6px;flex-wrap:wrap}
+.quick-counter{
+  min-width:62px;padding:8px 10px;border:1px solid rgba(255,255,255,.22);
+  background:rgba(10,10,10,.68);backdrop-filter:blur(9px);color:#fff;
+  font-size:11px;font-weight:900;text-align:center;cursor:pointer;
+}
+.quick-counter b{display:block;font-size:18px;line-height:1}
+.player-menu{
+  width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+  background:rgba(10,10,10,.7);color:#fff;font-weight:1000;cursor:pointer;
+}
+.table-hud{
+  position:absolute;left:50%;top:50%;z-index:30;transform:translate(-50%,-50%);
+  display:flex;align-items:stretch;
+  border-radius:999px;
+  background:rgba(8,8,8,.92);
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 8px 34px rgba(0,0,0,.55);
+  overflow:hidden;
+}
+.hud-btn,.hud-main{
+  border:0;background:transparent;color:#fff;cursor:pointer;
+}
+.hud-btn{width:54px;font-size:19px}
+.hud-btn:disabled{opacity:.25}
+.hud-main{
+  min-width:145px;padding:9px 18px;border-left:1px solid #383838;border-right:1px solid #383838;
+  font-weight:1000;text-transform:uppercase;
+}
+.hud-main span{display:block;font-size:12px;white-space:nowrap}
+.hud-main small{display:block;margin-top:2px;color:#aaa;font-size:10px}
+.sheet-backdrop{
+  position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.68);
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.game-sheet{
+  width:min(680px,100%);max-height:82vh;overflow:auto;
+  padding:24px;background:#171717;color:#fff;border-top:3px solid #f05232;
+  box-shadow:0 -20px 60px rgba(0,0,0,.5)
+}
+.game-sheet h2{margin:0 0 4px;font-size:28px;text-transform:uppercase;letter-spacing:-.04em}
+.game-sheet .muted{color:#aaa}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0}
+.sheet-action{min-height:52px;border:1px solid #3d3d3d;background:#222;color:#fff;font-weight:900;cursor:pointer}
+.sheet-action.danger{color:#ff755e}
+.damage-sheet-row{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:12px 0;border-bottom:1px solid #333;
+}
+.damage-sheet-controls{display:flex;align-items:center;gap:8px}
+.damage-sheet-controls button{width:42px;height:40px;border:1px solid #444;background:#252525;color:#fff;font-size:20px}
+.damage-sheet-controls b{min-width:34px;text-align:center;font-size:20px}
+@media(max-width:700px){
+ .table-mode .table-grid.players-2{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+ .table-mode .table-grid.players-5,.table-mode .table-grid.players-6{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr)}
+ .table-top{top:10px;left:12px;right:12px}.table-bottom{bottom:8px;left:8px;right:8px}
+ .quick-counter{min-width:52px;padding:6px;font-size:9px}.quick-counter b{font-size:15px}
+ .life-display{font-size:clamp(64px,20vw,110px)}
+ .life-hint{display:none}
+ .table-hud{transform:translate(-50%,-50%) scale(.88)}
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -780,24 +929,16 @@ label{
     </div>
   </div>
 
-  <div id="liveGameView" style="display:none">
-    <div class="live-toolbar">
-      <div>
-        <div class="kicker">Live · Commander Partie</div>
-        <div class="live-turn" id="turnLabel">Zug 1</div>
-        <div class="live-meta"><span id="gameTimer">00:00:00</span><span id="eventCount">0 Aktionen</span></div>
-      </div>
-      <div class="row">
-        <button class="action" id="undoBtn" onclick="undoLastAction()">↶ Rückgängig</button>
-        <button class="action" onclick="nextTurn()">Nächster Zug →</button>
-        <button class="action danger" onclick="finishGame()">Partie beenden</button>
-      </div>
-    </div>
+  <div id="liveGameView" class="table-mode" style="display:none">
     <div id="tableGrid" class="table-grid"></div>
-    <details class="event-log-panel">
-      <summary>Partieprotokoll <span id="eventLogCount"></span></summary>
-      <div id="eventLog" class="event-log"></div>
-    </details>
+    <div class="table-hud">
+      <button class="hud-btn" id="undoBtn" onclick="undoLastAction()" title="Rückgängig">↶</button>
+      <button class="hud-main" onclick="nextTurn()">
+        <span id="turnLabel">Zug 1</span>
+        <small id="gameTimer">00:00:00</small>
+      </button>
+      <button class="hud-btn" onclick="openGameMenu()" title="Partie-Menü">•••</button>
+    </div>
   </div>
 </section>
 
@@ -1028,6 +1169,7 @@ function startGame(){
   };
   liveGame.players.forEach(target=>liveGame.players.forEach(source=>{if(source.playerId!==target.playerId)target.commanderDamage[source.playerId]=0}));
   addEvent('game_start',null,{startPlayerId:liveGame.players[startIndex].playerId},`Partie gestartet · ${liveGame.players[startIndex].name} beginnt`);
+  document.body.classList.add('game-running');
   document.getElementById('gameSetupView').style.display='none';
   document.getElementById('liveGameView').style.display='block';
   startTimer();renderLiveGame();
@@ -1042,40 +1184,27 @@ function addEvent(type,playerId,data={},label=''){
 function renderLiveGame(){
   if(!liveGame)return;
   const active=liveGame.players[liveGame.activeIndex];
+  const grid=document.getElementById('tableGrid');
+  grid.className=`table-grid players-${liveGame.players.length}`;
   document.getElementById('turnLabel').textContent=`Zug ${liveGame.turn} · ${active?.name||''}`;
   const timer=document.getElementById('gameTimer');if(timer)timer.textContent=formatTime(elapsedSeconds());
-  const ec=document.getElementById('eventCount');if(ec)ec.textContent=`${liveGame.events.length} Aktionen`;
-  const ub=document.getElementById('undoBtn');if(ub)ub.disabled=!liveGame.events.some(e=>e.undo);
-  renderEventLog();
-  document.getElementById('tableGrid').innerHTML=liveGame.players.map((gp,i)=>{
-    const profile=state.players.find(p=>p.id===gp.playerId);
+  const ub=document.getElementById('undoBtn');if(ub)ub.disabled=!liveGame.events.some(e=>e.data?.before);
+  grid.innerHTML=liveGame.players.map((gp,i)=>{
     const art=gp.commander.art||gp.commander.image||'';
-    const damages=liveGame.players.filter(x=>x.playerId!==gp.playerId).map(source=>`
-      <div class="damage-row">
-        <div class="damage-name">von ${esc(source.commander.name)}</div>
-        <div class="damage-controls">
-          <button class="mini-btn" onclick="changeCommanderDamage('${gp.playerId}','${source.playerId}',-1)">−</button>
-          <b>${gp.commanderDamage[source.playerId]||0}</b>
-          <button class="mini-btn" onclick="changeCommanderDamage('${gp.playerId}','${source.playerId}',1)">+</button>
+    const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
+    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''}" style="--commander-art:url('${esc(art)}')">
+      <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
+      <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" onclick="changeLife('${gp.playerId}',-1)">−</button><button class="life-zone" aria-label="1 Leben erhalten" onclick="changeLife('${gp.playerId}',1)">+</button></div>
+      <div class="life-display">${gp.life}</div><div class="life-hint">− &nbsp;&nbsp; Leben &nbsp;&nbsp; +</div>
+      <div class="table-bottom">
+        <div class="quick-counters">
+          <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','poison')">GIFT <b>${gp.poison}</b></button>
+          <button class="quick-counter" onclick="openCommanderDamageSheet('${gp.playerId}')">CMD <b>${totalCmd}</b></button>
+          <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','commanderTax')">TAX <b>${gp.commanderTax}</b></button>
         </div>
-      </div>`).join('');
-    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''}">
-      <div class="table-art" style="background-image:url('${esc(art)}')"></div>
-      <div class="table-player-head">
-        <div><h3>${esc(gp.name)}${dangerReason(gp)?`<span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</h3><small>${esc(gp.commander.name)}</small></div>
+        <button class="player-menu" onclick="openPlayerSheet('${gp.playerId}')">•••</button>
       </div>
-      <div class="life-wrap">
-        <button class="life-btn" onclick="changeLife('${gp.playerId}',-1)">−</button>
-        <div class="life">${gp.life}</div>
-        <button class="life-btn" onclick="changeLife('${gp.playerId}',1)">+</button>
-      </div>
-      <div class="counter-strip">
-        <div class="counter-box"><div class="counter-label">Gift</div><div class="counter-control"><button class="mini-btn" onclick="changeCounter('${gp.playerId}','poison',-1)">−</button><b>${gp.poison}</b><button class="mini-btn" onclick="changeCounter('${gp.playerId}','poison',1)">+</button></div></div>
-        <div class="counter-box"><div class="counter-label">Commander Tax</div><div class="counter-control"><button class="mini-btn" onclick="changeCounter('${gp.playerId}','commanderTax',-2)">−</button><b>${gp.commanderTax}</b><button class="mini-btn" onclick="changeCounter('${gp.playerId}','commanderTax',2)">+</button></div></div>
-      </div>
-      <div class="cmd-damage"><h4>Commander-Schaden</h4>${damages}</div>
-      <div class="player-actions"><button class="action danger" onclick="toggleEliminated('${gp.playerId}')">${gp.eliminated?'Zurück ins Spiel':'Eliminiert'}</button></div>
-    </article>`;
+    </article>`
   }).join('');
 }
 function getLivePlayer(id){return liveGame?.players.find(p=>p.playerId===id)}
@@ -1131,6 +1260,35 @@ function renderEventLog(){
   count.textContent=`(${liveGame.events.length})`;
   box.innerHTML=liveGame.events.length?liveGame.events.slice().reverse().map(ev=>`<div class="event-item"><div class="event-time">ZUG ${ev.turn}<br>${new Date(ev.at).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div><div>${esc(ev.label||ev.type)}</div></div>`).join(''):`<div class="empty">Noch keine Aktionen.</div>`;
 }
+
+function closeSheet(){document.getElementById('gameSheetBackdrop')?.remove()}
+function makeSheet(title,subtitle,body){
+  closeSheet();const wrap=document.createElement('div');wrap.id='gameSheetBackdrop';wrap.className='sheet-backdrop';
+  wrap.onclick=e=>{if(e.target===wrap)closeSheet()};
+  wrap.innerHTML=`<div class="game-sheet"><div class="kicker">Commander Hub</div><h2>${esc(title)}</h2>${subtitle?`<div class="muted">${esc(subtitle)}</div>`:''}${body}<div class="row" style="margin-top:18px"><button class="sheet-action" style="padding:0 18px" onclick="closeSheet()">Schließen</button></div></div>`;
+  document.body.appendChild(wrap);
+}
+function openCounterSheet(id,key){
+  const p=getLivePlayer(id);if(!p)return;const label=key==='poison'?'Gift':'Commander Tax',step=key==='commanderTax'?2:1;
+  makeSheet(label,p.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeCounter('${id}','${key}',-${step});openCounterSheet('${id}','${key}')">− ${step}</button><button class="sheet-action" onclick="changeCounter('${id}','${key}',${step});openCounterSheet('${id}','${key}')">+ ${step}</button></div><div style="font-size:72px;font-weight:1000;text-align:center">${p[key]}</div>`);
+}
+function openCommanderDamageSheet(id){
+  const p=getLivePlayer(id);if(!p)return;
+  const rows=liveGame.players.filter(x=>x.playerId!==id).map(src=>`<div class="damage-sheet-row"><div><b>${esc(src.name)}</b><div class="muted">${esc(src.commander.name)}</div></div><div class="damage-sheet-controls"><button onclick="changeCommanderDamage('${id}','${src.playerId}',-1);openCommanderDamageSheet('${id}')">−</button><b>${p.commanderDamage[src.playerId]||0}</b><button onclick="changeCommanderDamage('${id}','${src.playerId}',1);openCommanderDamageSheet('${id}')">+</button></div></div>`).join('');
+  makeSheet('Commander-Schaden',p.name,`<div style="margin-top:14px">${rows}</div>`);
+}
+function openPlayerSheet(id){
+  const p=getLivePlayer(id);if(!p)return;
+  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="openCommanderDamageSheet('${id}')">Commander-Schaden</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
+}
+function openGameMenu(){
+  makeSheet('Partie',`Zug ${liveGame.turn} · ${formatTime(elapsedSeconds())}`,`<div class="sheet-grid"><button class="sheet-action" onclick="undoLastAction();closeSheet()">↶ Rückgängig</button><button class="sheet-action" onclick="nextTurn();closeSheet()">Nächster Zug →</button><button class="sheet-action" onclick="showEventLogSheet()">Partieprotokoll</button><button class="sheet-action danger" onclick="closeSheet();finishGame()">Partie beenden</button></div>`);
+}
+function showEventLogSheet(){
+  const rows=liveGame.events.slice().reverse().map(ev=>`<div class="damage-sheet-row"><div class="muted">Zug ${ev.turn}</div><div>${esc(ev.label||ev.type)}</div></div>`).join('');
+  makeSheet('Partieprotokoll',`${liveGame.events.length} Aktionen`,`<div style="margin-top:14px">${rows||'<div class="muted">Noch keine Aktionen.</div>'}</div>`);
+}
+
 function nextTurn(){
   if(!liveGame)return;
   let tries=0;
@@ -1170,7 +1328,7 @@ function saveFinishedGame(){
   const record={id:liveGame.id,date:liveGame.startedAt,endedAt:new Date().toISOString(),durationSeconds:elapsedSeconds(),turns:liveGame.turn,winnerId,placements,events:liveGame.events,
     players:liveGame.players.map(p=>({playerId:p.playerId,commander:p.commander,finalLife:p.life,poison:p.poison,commanderTax:p.commanderTax,commanderDamage:p.commanderDamage,eliminated:p.eliminated,placement:placements[p.playerId]}))};
   state.games.push(record);
-  clearInterval(gameTimerHandle);liveGame=null;Object.keys(gameSelection).forEach(k=>delete gameSelection[k]);
+  clearInterval(gameTimerHandle);document.body.classList.remove('game-running');liveGame=null;Object.keys(gameSelection).forEach(k=>delete gameSelection[k]);
   document.getElementById('finishOverlay')?.remove();document.getElementById('gameSetupView').style.display='block';document.getElementById('liveGameView').style.display='none';
   saveState();go('history');
 }

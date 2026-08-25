@@ -1,4 +1,4 @@
-const CACHE='commander-hub-v061';
+const CACHE='commander-hub-v07';
 const CORE=['./','./index.html','./manifest.webmanifest','./assets/commander-app-icon.webp','./assets/commander-icon-192.png','./assets/commander-icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));
