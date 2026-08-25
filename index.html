@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.2 — Lotus-style in-table Commander Damage mode */
+/* V0.7.3 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -913,6 +913,30 @@ body.game-running #game{display:block!important}
 }
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
+
+/* V0.7.3 — Commander Damage readability */
+body.cmd-mode .table-player .table-top,
+body.cmd-mode .table-player .life-tap,
+body.cmd-mode .table-player .life-display,
+body.cmd-mode .table-player .life-hint,
+body.cmd-mode .table-player .table-bottom,
+body.cmd-mode .table-player .swipe-hint{opacity:0;pointer-events:none}
+body.cmd-mode .table-player:after{background:rgba(0,0,0,.62)}
+body.cmd-mode .table-player.cmd-target:after{background:rgba(0,0,0,.80)}
+body.cmd-mode .table-player.cmd-source:after{background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.70))}
+body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{background:transparent;backdrop-filter:none}
+.cmd-mode-overlay{inset:0;padding:clamp(18px,3vw,42px)}
+.cmd-mode-kicker{color:#fff;opacity:1;font-size:clamp(11px,1.15vw,16px);font-weight:1000;letter-spacing:.16em;text-shadow:0 2px 10px #000}
+.cmd-mode-name{margin-top:8px;max-width:90%;color:#fff;font-size:clamp(24px,3vw,46px);line-height:.95;font-weight:1000;letter-spacing:-.045em;text-shadow:0 3px 18px #000}
+.cmd-mode-commander{margin-top:8px;max-width:88%;color:rgba(255,255,255,.85);font-size:clamp(11px,1.2vw,17px);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 10px #000}
+.cmd-mode-value{margin:18px 0 6px;color:#fff;font-size:clamp(82px,12vw,170px);line-height:.72;font-weight:1000;letter-spacing:-.085em;text-shadow:0 5px 30px #000}
+.cmd-mode-damage-label{margin-bottom:18px;color:rgba(255,255,255,.82);font-size:11px;font-weight:1000;letter-spacing:.15em;text-transform:uppercase}
+.cmd-mode-controls{display:flex;gap:12px}
+.cmd-mode-btn{width:clamp(72px,8vw,112px);height:clamp(58px,7vw,84px);border:2px solid rgba(255,255,255,.62);background:rgba(0,0,0,.76);color:#fff;font-size:clamp(28px,3vw,42px);box-shadow:0 5px 22px rgba(0,0,0,.4)}
+.cmd-mode-target-life{margin-top:20px;color:#fff;font-size:clamp(54px,8vw,110px);line-height:.8;font-weight:1000;letter-spacing:-.07em;opacity:1;text-shadow:0 5px 28px #000}
+.cmd-mode-target-life-label{margin-top:10px;color:rgba(255,255,255,.8);font-size:11px;font-weight:1000;letter-spacing:.16em;text-transform:uppercase}
+.cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -927,7 +951,7 @@ body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.2</div></header>
+<div class="version-label">V0.7.3</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1366,15 +1390,18 @@ function commanderDamageOverlay(gp){
     return `<div class="cmd-mode-overlay">
       <div class="cmd-mode-kicker">Commander Damage für</div>
       <div class="cmd-mode-name">${esc(target.name)}</div>
-      <div class="cmd-mode-target-life">${target.life} Leben</div>
+      <div class="cmd-mode-target-life">${target.life}</div>
+      <div class="cmd-mode-target-life-label">Leben</div>
       <button class="cmd-mode-close" onclick="exitCommanderDamageMode()">✓ Fertig</button>
     </div>`;
   }
   const value=target.commanderDamage[gp.playerId]||0;
   return `<div class="cmd-mode-overlay source">
-    <div class="cmd-mode-kicker">${esc(gp.name)} · Commander</div>
-    <div class="cmd-mode-name">${esc(gp.commander.name)}</div>
+    <div class="cmd-mode-kicker">Commander Damage von</div>
+    <div class="cmd-mode-name">${esc(gp.name)}</div>
+    <div class="cmd-mode-commander">${esc(gp.commander.name)}</div>
     <div class="cmd-mode-value">${value}</div>
+    <div class="cmd-mode-damage-label">Schaden</div>
     <div class="cmd-mode-controls">
       <button class="cmd-mode-btn" onclick="changeCommanderDamageInMode('${commanderDamageTargetId}','${gp.playerId}',-1)">−</button>
       <button class="cmd-mode-btn" onclick="changeCommanderDamageInMode('${commanderDamageTargetId}','${gp.playerId}',1)">+</button>
