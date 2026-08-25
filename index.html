@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.6 — Lotus-style in-table Commander Damage mode */
+/* V0.7.9 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -914,7 +914,7 @@ body.game-running #game{display:block!important}
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 
-/* V0.7.6 — Commander Damage readability */
+/* V0.7.9 — Commander Damage readability */
 body.cmd-mode .table-player .table-top,
 body.cmd-mode .table-player .life-tap,
 body.cmd-mode .table-player .life-display,
@@ -938,7 +938,7 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
 .cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
 
 
-/* V0.7.6 — persistent player colors */
+/* V0.7.9 — persistent player colors */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 5px var(--player-color),
@@ -982,7 +982,7 @@ body.cmd-mode .table-player.cmd-target .cmd-mode-close{
 @keyframes lifeChangeIn{from{opacity:0;transform:translate(-50%,-42%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 body.cmd-mode .life-change{display:none}
 
-/* V0.7.6 — active player, HUD placement, responsive CMD labels, color picker */
+/* V0.7.9 — active player, HUD placement, responsive CMD labels, color picker */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 9px var(--player-color),
@@ -1035,6 +1035,217 @@ body.cmd-mode .life-change{display:none}
 .color-swatch{width:20px;height:20px;border-radius:50%;background:var(--choice-color);box-shadow:0 0 12px color-mix(in srgb,var(--choice-color) 35%,transparent)}
 @media(max-width:600px){.color-picker-grid{grid-template-columns:1fr 1fr}.table-hud{bottom:10px}}
 
+
+/* V0.7.9 — tabletop seating layout */
+.table-player.active-turn{
+  box-shadow:
+    inset 0 0 0 13px var(--player-color),
+    inset 0 0 44px color-mix(in srgb,var(--player-color) 40%,transparent);
+}
+
+/* Opposite side of the physical table: whole player UI faces away from device owner. */
+.table-player.opposite-seat{
+  transform:rotate(180deg);
+}
+.table-player.opposite-seat:before{
+  transform:rotate(180deg) scale(1.025);
+}
+
+/* Put identity and counters on the outside edge of every seat. */
+.table-player .table-top{
+  top:auto;
+  left:14px;
+  right:auto;
+  bottom:14px;
+  max-width:48%;
+  display:block;
+}
+.table-player .table-name{font-size:clamp(17px,2vw,25px)}
+.table-player .table-commander{font-size:clamp(10px,1vw,13px)}
+.table-player .turn-dot{
+  position:absolute;
+  left:0;
+  bottom:52px;
+}
+.table-player .table-bottom{
+  left:auto;
+  right:14px;
+  bottom:14px;
+  width:auto;
+  align-items:flex-end;
+}
+.table-player .quick-counters{justify-content:flex-end}
+.table-player .player-menu{
+  position:absolute;
+  bottom:auto;
+  top:0;
+  right:0;
+}
+
+/* Menu goes to the outer upper corner, never toward the center cross. */
+.table-player:nth-child(odd) .player-menu{
+  right:auto;
+  left:0;
+}
+.table-player:nth-child(even) .player-menu{
+  right:0;
+  left:auto;
+}
+
+/* Keep the centre clear for the single round controller. */
+.table-hud{
+  top:50%;
+  bottom:auto;
+  transform:translate(-50%,-50%);
+  border:2px solid rgba(255,255,255,.24);
+}
+.table-hud.hud-opposite{
+  transform:translate(-50%,-50%) rotate(180deg);
+}
+
+/* The active player's life is an unmistakable color cue. */
+.table-player.active-turn .life-display,
+.table-player.active-turn .life-hint{
+  color:var(--player-color);
+}
+
+/* In CMD mode the overlays inherit the physical seat rotation automatically. */
+body.cmd-mode .table-player .table-top,
+body.cmd-mode .table-player .table-bottom{pointer-events:none}
+
+@media(max-width:700px){
+  .table-player.active-turn{
+    box-shadow:
+      inset 0 0 0 9px var(--player-color),
+      inset 0 0 34px color-mix(in srgb,var(--player-color) 38%,transparent);
+  }
+  .table-player .table-top{left:9px;bottom:9px;max-width:45%}
+  .table-player .table-bottom{right:9px;bottom:9px}
+  .table-player .quick-counter{min-width:48px}
+}
+
+
+/* V0.7.9 — physical tabletop orientation fixes */
+
+/* The opposite player's entire tile, including commander art, faces them.
+   v0.7.7 counter-rotated :before; remove that counter rotation. */
+.table-player.opposite-seat:before{
+  transform:scale(1.025);
+}
+
+/* Keep the three-dot control away from Gift/CMD/Tax.
+   It lives on the OUTER TOP corner of each physical seat. */
+.table-player .player-menu{
+  top:14px;
+  bottom:auto;
+}
+.table-player:nth-child(odd) .player-menu{
+  left:14px;
+  right:auto;
+}
+.table-player:nth-child(even) .player-menu{
+  right:14px;
+  left:auto;
+}
+
+/* Because opposite-seat is rotated 180deg, these become the far/outer corners
+   for the players sitting across the table. */
+.table-player.opposite-seat:nth-child(odd) .player-menu{
+  left:14px;
+  right:auto;
+}
+.table-player.opposite-seat:nth-child(even) .player-menu{
+  right:14px;
+  left:auto;
+}
+
+/* Sheets opened by an opposite-seat player face that player too. */
+body.sheet-opposite .sheet-backdrop .sheet,
+body.sheet-opposite .sheet-modal,
+body.sheet-opposite .bottom-sheet{
+  transform:rotate(180deg);
+}
+
+/* If the app uses a generic sheet panel nested directly in the backdrop,
+   rotate that too without rotating the backdrop itself. */
+body.sheet-opposite .sheet-backdrop > div:not(.sheet){
+  transform:rotate(180deg);
+}
+
+/* Preserve existing modal sizing while rotating around its own center. */
+body.sheet-opposite .sheet-backdrop{
+  transform:none !important;
+}
+
+@media(max-width:700px){
+  .table-player .player-menu{top:9px}
+  .table-player:nth-child(odd) .player-menu{left:9px}
+  .table-player:nth-child(even) .player-menu{right:9px}
+}
+
+
+/* V0.7.9 — CMD mode faces the player who opened it */
+
+/*
+Normal table:
+- near/bottom seats face bottom
+- opposite/top seats face top
+
+Commander Damage:
+the whole CMD interaction temporarily belongs to the TARGET player.
+Therefore every quadrant faces that target, regardless of the quadrant's
+normal physical seat.
+*/
+body.cmd-mode:not(.cmd-view-opposite) .table-player.opposite-seat{
+  transform:none;
+}
+body.cmd-mode.cmd-view-opposite .table-player.near-seat{
+  transform:rotate(180deg);
+}
+body.cmd-mode.cmd-view-opposite .table-player.opposite-seat{
+  transform:rotate(180deg);
+}
+
+/* Background artwork follows the same temporary CMD orientation. */
+body.cmd-mode:not(.cmd-view-opposite) .table-player.opposite-seat:before,
+body.cmd-mode:not(.cmd-view-opposite) .table-player.near-seat:before{
+  transform:scale(1.025);
+}
+body.cmd-mode.cmd-view-opposite .table-player:before{
+  transform:scale(1.025);
+}
+
+/* Move ellipsis to the side midpoint, fully away from lower counters. */
+.table-player .player-menu,
+.table-player:nth-child(odd) .player-menu,
+.table-player:nth-child(even) .player-menu,
+.table-player.opposite-seat:nth-child(odd) .player-menu,
+.table-player.opposite-seat:nth-child(even) .player-menu{
+  top:50%;
+  bottom:auto;
+  transform:translateY(-50%);
+}
+.table-player:nth-child(odd) .player-menu,
+.table-player.opposite-seat:nth-child(odd) .player-menu{
+  left:14px;
+  right:auto;
+}
+.table-player:nth-child(even) .player-menu,
+.table-player.opposite-seat:nth-child(even) .player-menu{
+  right:14px;
+  left:auto;
+}
+
+/* During CMD entry, normal ellipsis is hidden anyway to keep the mode clean. */
+body.cmd-mode .player-menu{opacity:0;pointer-events:none}
+
+@media(max-width:700px){
+  .table-player:nth-child(odd) .player-menu,
+  .table-player.opposite-seat:nth-child(odd) .player-menu{left:8px}
+  .table-player:nth-child(even) .player-menu,
+  .table-player.opposite-seat:nth-child(even) .player-menu{right:8px}
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -1049,7 +1260,7 @@ body.cmd-mode .life-change{display:none}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.6</div></header>
+<div class="version-label">V0.7.9</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1155,6 +1366,7 @@ let avatarDraft=null, avatarTimer=null;
 const gameSelection={};
 let liveGame=null;
 let commanderDamageTargetId=null;
+let sheetSeatPlayerId=null;
 const lifeChangeDisplay={};
 const lifeChangeTimers={};
 let gameTimerHandle=null;
@@ -1356,6 +1568,8 @@ function renderLiveGame(){
   if(!liveGame)return;
   const active=liveGame.players[liveGame.activeIndex];
   const grid=document.getElementById('tableGrid');
+  const hud=document.querySelector('.table-hud');
+  if(hud)hud.classList.toggle('hud-opposite',liveGame.activeIndex<Math.ceil(liveGame.players.length/2));
   grid.className=`table-grid players-${liveGame.players.length}`;
   document.getElementById('turnLabel').textContent=`Zug ${liveGame.turn} · ${active?.name||''}`;
   const timer=document.getElementById('gameTimer');if(timer)timer.textContent=formatTime(elapsedSeconds());
@@ -1363,7 +1577,7 @@ function renderLiveGame(){
   grid.innerHTML=liveGame.players.map((gp,i)=>{
     const art=gp.commander.art||gp.commander.image||'';
     const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
-    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}');--player-color:${gp.playerColor||'#ef482b'}">
+    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${i<Math.ceil(liveGame.players.length/2)?'opposite-seat':'near-seat'} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}');--player-color:${gp.playerColor||'#ef482b'}">
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
       <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
       <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
@@ -1483,12 +1697,15 @@ function enterCommanderDamageMode(targetId){
   if(!liveGame||!getLivePlayer(targetId))return;
   closeSheet();
   commanderDamageTargetId=targetId;
+  const targetIndex=liveGame.players.findIndex(p=>p.playerId===targetId);
+  const targetIsOpposite=targetIndex>=0 && targetIndex<Math.ceil(liveGame.players.length/2);
   document.body.classList.add('cmd-mode');
+  document.body.classList.toggle('cmd-view-opposite',targetIsOpposite);
   renderLiveGame();
 }
 function exitCommanderDamageMode(){
   commanderDamageTargetId=null;
-  document.body.classList.remove('cmd-mode');
+  document.body.classList.remove('cmd-mode','cmd-view-opposite');
   renderLiveGame();
 }
 function commanderDamageOverlay(gp){
@@ -1521,7 +1738,9 @@ function changeCommanderDamageInMode(targetId,sourceId,n){
   // renderLiveGame keeps the mode visible and updates all quadrants.
 }
 
-function closeSheet(){document.getElementById('gameSheetBackdrop')?.remove()}
+function closeSheet(){
+  sheetSeatPlayerId=null;
+  document.body.classList.remove('sheet-opposite');document.getElementById('gameSheetBackdrop')?.remove()}
 function makeSheet(title,subtitle,body){
   closeSheet();const wrap=document.createElement('div');wrap.id='gameSheetBackdrop';wrap.className='sheet-backdrop';
   wrap.onclick=e=>{if(e.target===wrap)closeSheet()};
@@ -1538,6 +1757,8 @@ function openCommanderDamageSheet(id){
   makeSheet('Commander-Schaden',p.name,`<div style="margin-top:14px">${rows}</div>`);
 }
 function openPlayerSheet(id){
+  sheetSeatPlayerId=id;
+  document.body.classList.toggle('sheet-opposite',!!getLivePlayer(id)&&liveGame.players.indexOf(getLivePlayer(id))<Math.ceil(liveGame.players.length/2));
   const p=getLivePlayer(id);if(!p)return;
   makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action" onclick="openPlayerColorSheet('${id}')">Farbe ändern</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
 }

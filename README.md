@@ -1,11 +1,14 @@
-# MTG Commander Hub V0.7.6
+# MTG Commander Hub V0.7.9
 
-- aktiver Spieler: deutlich dickerer Rahmen in Spielerfarbe
-- Lebenszahl des aktiven Spielers übernimmt seine Spielerfarbe
-- zentrale Turn/Timer-Leiste sitzt jetzt unten mittig statt über den zentralen Countern/Namen
-- Commander-Damage-Namen und Commandernamen umbrechen auf kleinen Feldern statt abgeschnitten zu werden
-- responsive CMD-Typografie für kleinere Fenster
-- Spieler-Menü (•••) enthält jetzt „Farbe ändern“
-- sechs Spielerfarben direkt während der Partie auswählbar
-- Farbwechsel aktualisiert Rahmen, Life-Farbe und Commander-Damage-Akzente sofort
-- Version V0.7.6
+Commander-Damage-Perspektive:
+- CMD-Modus richtet jetzt ALLE vier Quadranten nach dem Spieler aus, der Commander Damage einträgt.
+- Startet ein Spieler unten CMD, sind alle CMD-Werte für die untere Tischseite lesbar.
+- Startet ein Spieler oben CMD, drehen sich alle CMD-Werte um 180° und sind für die obere Tischseite lesbar.
+- Nach „Fertig“ kehrt jeder Quadrant zu seiner normalen Tisch-Ausrichtung zurück.
+
+Drei-Punkte-Menü:
+- nicht mehr bei Gift/CMD/Tax
+- sitzt jetzt mittig am äußeren Seitenrand des jeweiligen Quadranten
+- im CMD-Modus ausgeblendet
+
+Version V0.7.9
