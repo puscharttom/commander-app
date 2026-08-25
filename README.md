@@ -1,12 +1,23 @@
-# MTG Commander Hub V0.7.2
+# MTG Commander Hub V0.7.4
 
-Commander Damage wurde auf einen Lotus-artigen In-Table-Modus umgebaut:
+## Spielerfarben
+Jeder Teilnehmer erhält für die laufende Partie eine feste Akzentfarbe.
 
-- CMD beim Zielspieler drücken oder horizontal über dessen Feld swipen.
-- Kein separates Commander-Damage-Menü mehr.
-- Der Zielspieler bleibt in seinem eigenen Quadranten und zeigt „Commander Damage für …“ + aktuelles Leben.
-- Alle gegnerischen Quadranten werden zu Commander-Damage-Flächen ihres jeweiligen Commanders.
-- Dort wird der Schaden direkt mit +/- eingetragen.
-- Commander Damage zieht weiterhin automatisch dieselbe Menge Leben vom Zielspieler ab.
-- „Fertig“ im Ziel-Quadranten beendet den Modus.
-- Version im Header: V0.7.2.
+- Spieler 1: Türkis
+- Spieler 2: Gold
+- Spieler 3: Orange
+- Spieler 4: Violett
+- Spieler 5: Blau
+- Spieler 6: Grün
+
+## Aktiver Spieler
+- deutlich sichtbarer Rahmen in der Spielerfarbe
+- Turn-Dot übernimmt dieselbe Farbe
+- dezenter innerer Glow
+
+## Commander Damage
+- gegnerischer Commander-Damage-Wert übernimmt die Farbe des jeweiligen Spielers/Commanders
+- Plus-Button und untere Akzentlinie verwenden dieselbe Farbe
+- Zielspieler wird ebenfalls mit seiner eigenen Farbe markiert
+
+Commander-Artworks bleiben unverändert; die Farben werden nur als UI-Akzente verwendet.

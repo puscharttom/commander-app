@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.3 — Lotus-style in-table Commander Damage mode */
+/* V0.7.4 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -914,7 +914,7 @@ body.game-running #game{display:block!important}
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 
-/* V0.7.3 — Commander Damage readability */
+/* V0.7.4 — Commander Damage readability */
 body.cmd-mode .table-player .table-top,
 body.cmd-mode .table-player .life-tap,
 body.cmd-mode .table-player .life-display,
@@ -937,6 +937,46 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
 .cmd-mode-target-life-label{margin-top:10px;color:rgba(255,255,255,.8);font-size:11px;font-weight:1000;letter-spacing:.16em;text-transform:uppercase}
 .cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
 
+
+/* V0.7.4 — persistent player colors */
+.table-player.active-turn{
+  box-shadow:
+    inset 0 0 0 5px var(--player-color),
+    inset 0 0 26px color-mix(in srgb,var(--player-color) 28%,transparent);
+}
+.table-player.active-turn .turn-dot{
+  background:var(--player-color);
+  box-shadow:0 0 18px var(--player-color);
+}
+.table-player.active-turn:after{
+  outline:1px solid color-mix(in srgb,var(--player-color) 65%,transparent);
+  outline-offset:-6px;
+}
+body.cmd-mode .table-player.cmd-source .cmd-mode-kicker{
+  color:var(--player-color);
+}
+body.cmd-mode .table-player.cmd-source .cmd-mode-value{
+  color:var(--player-color);
+  text-shadow:0 4px 26px #000,0 0 22px color-mix(in srgb,var(--player-color) 35%,transparent);
+}
+body.cmd-mode .table-player.cmd-source .cmd-mode-btn:last-child{
+  border-color:var(--player-color);
+  color:var(--player-color);
+}
+body.cmd-mode .table-player.cmd-source{
+  box-shadow:inset 0 -4px 0 var(--player-color);
+}
+body.cmd-mode .table-player.cmd-target{
+  box-shadow:inset 0 0 0 4px var(--player-color);
+}
+body.cmd-mode .table-player.cmd-target .cmd-mode-kicker,
+body.cmd-mode .table-player.cmd-target .cmd-mode-close{
+  color:var(--player-color);
+}
+body.cmd-mode .table-player.cmd-target .cmd-mode-close{
+  border-color:var(--player-color);
+}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -951,7 +991,7 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.3</div></header>
+<div class="version-label">V0.7.4</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1236,7 +1276,7 @@ function startGame(){
   liveGame={
     id:uid('g'),startedAt:new Date().toISOString(),turn:1,activeIndex:startIndex,
     events:[],eliminationOrder:[],
-    players:selected.map(p=>({playerId:p.id,name:p.name,avatar:p.avatar||null,commander:gameSelection[p.id].commander,life:40,poison:0,commanderTax:0,eliminated:false,commanderDamage:{}}))
+    players:selected.map((p,i)=>({playerId:p.id,name:p.name,avatar:p.avatar||null,commander:gameSelection[p.id].commander,playerColor:['#22d3c5','#f2c94c','#f28c38','#a879e8','#55a7ff','#69c779'][i%6],life:40,poison:0,commanderTax:0,eliminated:false,commanderDamage:{}}))
   };
   liveGame.players.forEach(target=>liveGame.players.forEach(source=>{if(source.playerId!==target.playerId)target.commanderDamage[source.playerId]=0}));
   addEvent('game_start',null,{startPlayerId:liveGame.players[startIndex].playerId},`Partie gestartet · ${liveGame.players[startIndex].name} beginnt`);
@@ -1263,7 +1303,7 @@ function renderLiveGame(){
   grid.innerHTML=liveGame.players.map((gp,i)=>{
     const art=gp.commander.art||gp.commander.image||'';
     const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
-    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}')">
+    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}');--player-color:${gp.playerColor||'#ef482b'}">
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
       <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
       <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
