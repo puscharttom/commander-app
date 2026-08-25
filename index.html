@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.4 — Lotus-style in-table Commander Damage mode */
+/* V0.7.5 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -914,7 +914,7 @@ body.game-running #game{display:block!important}
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 
-/* V0.7.4 — Commander Damage readability */
+/* V0.7.5 — Commander Damage readability */
 body.cmd-mode .table-player .table-top,
 body.cmd-mode .table-player .life-tap,
 body.cmd-mode .table-player .life-display,
@@ -938,7 +938,7 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
 .cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
 
 
-/* V0.7.4 — persistent player colors */
+/* V0.7.5 — persistent player colors */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 5px var(--player-color),
@@ -977,6 +977,10 @@ body.cmd-mode .table-player.cmd-target .cmd-mode-close{
   border-color:var(--player-color);
 }
 
+
+.life-change{position:absolute;left:50%;top:68%;z-index:5;transform:translate(-50%,-50%);min-width:78px;padding:7px 14px 8px;border-radius:999px;border:2px solid var(--player-color);background:rgba(5,5,5,.76);backdrop-filter:blur(8px);color:#fff;text-align:center;font-size:clamp(22px,3vw,38px);line-height:1;font-weight:1000;letter-spacing:-.04em;text-shadow:0 2px 10px #000;box-shadow:0 5px 20px rgba(0,0,0,.35);pointer-events:none;animation:lifeChangeIn .12s ease-out}
+@keyframes lifeChangeIn{from{opacity:0;transform:translate(-50%,-42%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+body.cmd-mode .life-change{display:none}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -991,7 +995,7 @@ body.cmd-mode .table-player.cmd-target .cmd-mode-close{
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.4</div></header>
+<div class="version-label">V0.7.5</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1097,6 +1101,8 @@ let avatarDraft=null, avatarTimer=null;
 const gameSelection={};
 let liveGame=null;
 let commanderDamageTargetId=null;
+const lifeChangeDisplay={};
+const lifeChangeTimers={};
 let gameTimerHandle=null;
 
 function loadState(){
@@ -1307,7 +1313,9 @@ function renderLiveGame(){
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
       <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
       <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
-      <div class="life-display">${gp.life}</div><div class="life-hint">− &nbsp;&nbsp; Leben &nbsp;&nbsp; +</div>
+      <div class="life-display">${gp.life}</div>
+      ${lifeChangeDisplay[gp.playerId] ? `<div class="life-change">${lifeChangeDisplay[gp.playerId]>0?'+':''}${lifeChangeDisplay[gp.playerId]}</div>` : ''}
+      <div class="life-hint">− &nbsp;&nbsp; Leben &nbsp;&nbsp; +</div>
       <div class="table-bottom">
         <div class="quick-counters">
           <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','poison')">GIFT <b>${gp.poison}</b></button>
@@ -1332,7 +1340,12 @@ function snapshotPlayer(p){return JSON.parse(JSON.stringify({life:p.life,poison:
 function changeLife(id,n){
   const p=getLivePlayer(id);if(!p)return;const before=snapshotPlayer(p);p.life+=n;
   addEvent('life',id,{delta:n,before,after:snapshotPlayer(p)},`${p.name}: Leben ${n>0?'+':''}${n} → ${p.life}`);
-  renderLiveGame();
+  showLifeChange(id,n);renderLiveGame();
+}
+function showLifeChange(id,n){
+  lifeChangeDisplay[id]=(lifeChangeDisplay[id]||0)+n;
+  clearTimeout(lifeChangeTimers[id]);
+  lifeChangeTimers[id]=setTimeout(()=>{delete lifeChangeDisplay[id];delete lifeChangeTimers[id];if(liveGame)renderLiveGame()},2200);
 }
 function changeCounter(id,key,n){
   const p=getLivePlayer(id);if(!p)return;const before=snapshotPlayer(p);p[key]=Math.max(0,(p[key]||0)+n);
@@ -1348,6 +1361,7 @@ function changeCommanderDamage(targetId,sourceId,n){
   const actualDelta=newDamage-oldDamage;
   p.commanderDamage[sourceId]=newDamage;
   p.life-=actualDelta;
+  showLifeChange(targetId,-actualDelta);
   addEvent('commander_damage',targetId,{sourceId,delta:actualDelta,before,after:snapshotPlayer(p)},`${p.name}: ${actualDelta>0?'+':''}${actualDelta} Commander-Schaden von ${src.commander.name} → ${newDamage} · Leben ${p.life}`);
   renderLiveGame();
 }
