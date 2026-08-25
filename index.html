@@ -874,7 +874,7 @@ body.game-running #game{display:block!important}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 
-/* V0.7.5 — Lotus-style in-table Commander Damage mode */
+/* V0.7.6 — Lotus-style in-table Commander Damage mode */
 .table-player.cmd-target{
   background:#0c0c0c;
 }
@@ -914,7 +914,7 @@ body.game-running #game{display:block!important}
 .cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
 body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 
-/* V0.7.5 — Commander Damage readability */
+/* V0.7.6 — Commander Damage readability */
 body.cmd-mode .table-player .table-top,
 body.cmd-mode .table-player .life-tap,
 body.cmd-mode .table-player .life-display,
@@ -938,7 +938,7 @@ body.cmd-mode .cmd-mode-overlay,body.cmd-mode .cmd-mode-overlay.source{backgroun
 .cmd-mode-close{margin-top:24px;min-width:150px;min-height:54px;padding:0 22px;border:2px solid rgba(255,255,255,.68);background:rgba(0,0,0,.78);color:#fff;font-size:12px;font-weight:1000}
 
 
-/* V0.7.5 — persistent player colors */
+/* V0.7.6 — persistent player colors */
 .table-player.active-turn{
   box-shadow:
     inset 0 0 0 5px var(--player-color),
@@ -981,6 +981,60 @@ body.cmd-mode .table-player.cmd-target .cmd-mode-close{
 .life-change{position:absolute;left:50%;top:68%;z-index:5;transform:translate(-50%,-50%);min-width:78px;padding:7px 14px 8px;border-radius:999px;border:2px solid var(--player-color);background:rgba(5,5,5,.76);backdrop-filter:blur(8px);color:#fff;text-align:center;font-size:clamp(22px,3vw,38px);line-height:1;font-weight:1000;letter-spacing:-.04em;text-shadow:0 2px 10px #000;box-shadow:0 5px 20px rgba(0,0,0,.35);pointer-events:none;animation:lifeChangeIn .12s ease-out}
 @keyframes lifeChangeIn{from{opacity:0;transform:translate(-50%,-42%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 body.cmd-mode .life-change{display:none}
+
+/* V0.7.6 — active player, HUD placement, responsive CMD labels, color picker */
+.table-player.active-turn{
+  box-shadow:
+    inset 0 0 0 9px var(--player-color),
+    inset 0 0 34px color-mix(in srgb,var(--player-color) 34%,transparent);
+}
+.table-player.active-turn .life-display{
+  color:var(--player-color);
+  text-shadow:0 5px 28px #000,0 0 24px color-mix(in srgb,var(--player-color) 34%,transparent);
+}
+.table-hud{
+  top:auto;
+  bottom:18px;
+  transform:translateX(-50%);
+}
+.cmd-mode-name{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  text-align:center;
+  line-height:.95;
+  max-width:96%;
+}
+.cmd-mode-commander{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  text-align:center;
+  line-height:1.08;
+  max-width:94%;
+}
+@media(max-width:900px), (max-height:650px){
+  .cmd-mode-overlay{padding:12px}
+  .cmd-mode-kicker{font-size:10px}
+  .cmd-mode-name{font-size:clamp(18px,3.2vw,31px);margin-top:5px}
+  .cmd-mode-commander{font-size:clamp(10px,1.45vw,14px);margin-top:5px}
+  .cmd-mode-value{font-size:clamp(62px,9vw,105px);margin:12px 0 4px}
+  .cmd-mode-damage-label{margin-bottom:10px;font-size:9px}
+  .cmd-mode-btn{width:76px;height:58px}
+  .cmd-mode-target-life{margin-top:12px}
+  .cmd-mode-close{margin-top:14px}
+}
+.color-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0}
+.color-choice{
+  min-height:54px;border:2px solid #3c3c3c;background:#222;color:#fff;
+  display:flex;align-items:center;gap:9px;padding:8px 10px;font-weight:900;cursor:pointer
+}
+.color-choice.selected{border-color:var(--choice-color)}
+.color-swatch{width:20px;height:20px;border-radius:50%;background:var(--choice-color);box-shadow:0 0 12px color-mix(in srgb,var(--choice-color) 35%,transparent)}
+@media(max-width:600px){.color-picker-grid{grid-template-columns:1fr 1fr}.table-hud{bottom:10px}}
+
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -995,7 +1049,7 @@ body.cmd-mode .life-change{display:none}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.5</div></header>
+<div class="version-label">V0.7.6</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1485,8 +1539,30 @@ function openCommanderDamageSheet(id){
 }
 function openPlayerSheet(id){
   const p=getLivePlayer(id);if(!p)return;
-  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
+  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action" onclick="openPlayerColorSheet('${id}')">Farbe ändern</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
 }
+
+const PLAYER_COLORS=[
+  {name:'Türkis',value:'#22d3c5'},
+  {name:'Gold',value:'#f2c94c'},
+  {name:'Orange',value:'#f28c38'},
+  {name:'Violett',value:'#a879e8'},
+  {name:'Blau',value:'#55a7ff'},
+  {name:'Grün',value:'#69c779'}
+];
+function openPlayerColorSheet(id){
+  const p=getLivePlayer(id);if(!p)return;
+  const choices=PLAYER_COLORS.map(c=>`<button class="color-choice ${p.playerColor===c.value?'selected':''}" style="--choice-color:${c.value}" onclick="setPlayerColor('${id}','${c.value}')"><span class="color-swatch"></span>${c.name}</button>`).join('');
+  makeSheet('Farbe ändern',p.name,`<div class="color-picker-grid">${choices}</div>`);
+}
+function setPlayerColor(id,color){
+  const p=getLivePlayer(id);if(!p)return;
+  p.playerColor=color;
+  addEvent('player_color',id,{color},`${p.name}: Spielerfarbe geändert`);
+  renderLiveGame();
+  openPlayerColorSheet(id);
+}
+
 function openGameMenu(){
   makeSheet('Partie',`Zug ${liveGame.turn} · ${formatTime(elapsedSeconds())}`,`<div class="sheet-grid"><button class="sheet-action" onclick="undoLastAction();closeSheet()">↶ Rückgängig</button><button class="sheet-action" onclick="nextTurn();closeSheet()">Nächster Zug →</button><button class="sheet-action" onclick="showEventLogSheet()">Partieprotokoll</button><button class="sheet-action danger" onclick="closeSheet();finishGame()">Partie beenden</button></div>`);
 }
