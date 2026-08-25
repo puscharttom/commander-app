@@ -1,10 +1,12 @@
-# MTG Commander Hub V0.7.1
+# MTG Commander Hub V0.7.2
 
-- Versionsnummer oben rechts im Header
-- Commander Damage zieht automatisch dieselbe Menge Leben ab
-- Commander Damage zurücknehmen stellt entsprechend Leben wieder her
-- Tap auf Life-Fläche: -1 / +1
-- Long Press (~0,5 Sekunden): -5 / +5
-- Horizontaler Swipe über ein Spielerfeld öffnet direkt Commander Damage
-- dezente Swipe-Indikatoren am Rand
-- Undo behandelt Commander Damage + Life gemeinsam
+Commander Damage wurde auf einen Lotus-artigen In-Table-Modus umgebaut:
+
+- CMD beim Zielspieler drücken oder horizontal über dessen Feld swipen.
+- Kein separates Commander-Damage-Menü mehr.
+- Der Zielspieler bleibt in seinem eigenen Quadranten und zeigt „Commander Damage für …“ + aktuelles Leben.
+- Alle gegnerischen Quadranten werden zu Commander-Damage-Flächen ihres jeweiligen Commanders.
+- Dort wird der Schaden direkt mit +/- eingetragen.
+- Commander Damage zieht weiterhin automatisch dieselbe Menge Leben vom Zielspieler ab.
+- „Fertig“ im Ziel-Quadranten beendet den Modus.
+- Version im Header: V0.7.2.

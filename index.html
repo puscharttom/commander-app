@@ -873,6 +873,46 @@ body.game-running #game{display:block!important}
 .swipe-hint.left{left:5px}.swipe-hint.right{right:5px}
 .life-zone.longpress-active{background:rgba(255,255,255,.10)}
 @media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
+
+/* V0.7.2 — Lotus-style in-table Commander Damage mode */
+.table-player.cmd-target{
+  background:#0c0c0c;
+}
+.table-player.cmd-target:before{filter:grayscale(1) brightness(.24)}
+.table-player.cmd-source:before{filter:brightness(.48)}
+.cmd-mode-overlay{
+  position:absolute;inset:0;z-index:18;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:18px;text-align:center;
+  background:rgba(7,7,7,.38);
+  backdrop-filter:blur(1px);
+}
+.cmd-mode-overlay.source{background:rgba(7,7,7,.24)}
+.cmd-mode-kicker{
+  font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;opacity:.72
+}
+.cmd-mode-name{
+  margin-top:5px;max-width:92%;
+  font-size:clamp(15px,2vw,24px);font-weight:1000;text-transform:uppercase;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.cmd-mode-value{
+  margin:10px 0 14px;
+  font-size:clamp(58px,9vw,112px);line-height:.8;font-weight:1000;letter-spacing:-.07em;
+  text-shadow:0 4px 24px #000
+}
+.cmd-mode-controls{display:flex;gap:10px}
+.cmd-mode-btn{
+  width:68px;height:54px;border:1px solid rgba(255,255,255,.3);
+  background:rgba(10,10,10,.72);color:#fff;font-size:28px;font-weight:900;cursor:pointer
+}
+.cmd-mode-close{
+  margin-top:16px;min-height:44px;padding:0 18px;border:1px solid rgba(255,255,255,.3);
+  background:rgba(10,10,10,.72);color:#fff;font-size:11px;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer
+}
+.cmd-mode-target-life{margin-top:8px;font-size:12px;font-weight:800;opacity:.68}
+body.cmd-mode .table-hud{opacity:.2;pointer-events:none}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -887,7 +927,7 @@ body.game-running #game{display:block!important}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-<div class="version-label">V0.7.1</div></header>
+<div class="version-label">V0.7.2</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -992,6 +1032,7 @@ let state=loadState();
 let avatarDraft=null, avatarTimer=null;
 const gameSelection={};
 let liveGame=null;
+let commanderDamageTargetId=null;
 let gameTimerHandle=null;
 
 function loadState(){
@@ -1175,7 +1216,7 @@ function startGame(){
   };
   liveGame.players.forEach(target=>liveGame.players.forEach(source=>{if(source.playerId!==target.playerId)target.commanderDamage[source.playerId]=0}));
   addEvent('game_start',null,{startPlayerId:liveGame.players[startIndex].playerId},`Partie gestartet · ${liveGame.players[startIndex].name} beginnt`);
-  document.body.classList.add('game-running');
+  commanderDamageTargetId=null;document.body.classList.remove('cmd-mode');document.body.classList.add('game-running');
   document.getElementById('gameSetupView').style.display='none';
   document.getElementById('liveGameView').style.display='block';
   startTimer();renderLiveGame();
@@ -1198,7 +1239,7 @@ function renderLiveGame(){
   grid.innerHTML=liveGame.players.map((gp,i)=>{
     const art=gp.commander.art||gp.commander.image||'';
     const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
-    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''}" style="--commander-art:url('${esc(art)}')">
+    return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''} ${commanderDamageTargetId===gp.playerId?'cmd-target':(commanderDamageTargetId?'cmd-source':'')}" style="--commander-art:url('${esc(art)}')">
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
       <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
       <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
@@ -1206,11 +1247,12 @@ function renderLiveGame(){
       <div class="table-bottom">
         <div class="quick-counters">
           <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','poison')">GIFT <b>${gp.poison}</b></button>
-          <button class="quick-counter" onclick="openCommanderDamageSheet('${gp.playerId}')">CMD <b>${totalCmd}</b></button>
+          <button class="quick-counter" onclick="enterCommanderDamageMode('${gp.playerId}')">CMD <b>${totalCmd}</b></button>
           <button class="quick-counter" onclick="openCounterSheet('${gp.playerId}','commanderTax')">TAX <b>${gp.commanderTax}</b></button>
         </div>
         <button class="player-menu" onclick="openPlayerSheet('${gp.playerId}')">•••</button>
       </div>
+      ${commanderDamageTargetId ? commanderDamageOverlay(gp) : ''}
     </article>`
   }).join('');
   bindTableGestures();
@@ -1296,12 +1338,52 @@ function bindTableGestures(){
     zone.addEventListener('pointerup',e=>{
       clearTimeout(timer);zone.classList.remove('longpress-active');
       const dx=e.clientX-sx,dy=e.clientY-sy;
-      if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){openCommanderDamageSheet(id);return}
+      if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){enterCommanderDamageMode(id);return}
       if(!moved&&!longFired)changeLife(id,delta);
     });
     zone.addEventListener('pointercancel',()=>{clearTimeout(timer);zone.classList.remove('longpress-active')});
     zone.addEventListener('contextmenu',e=>e.preventDefault());
   });
+}
+
+
+function enterCommanderDamageMode(targetId){
+  if(!liveGame||!getLivePlayer(targetId))return;
+  closeSheet();
+  commanderDamageTargetId=targetId;
+  document.body.classList.add('cmd-mode');
+  renderLiveGame();
+}
+function exitCommanderDamageMode(){
+  commanderDamageTargetId=null;
+  document.body.classList.remove('cmd-mode');
+  renderLiveGame();
+}
+function commanderDamageOverlay(gp){
+  const target=getLivePlayer(commanderDamageTargetId);
+  if(!target)return '';
+  if(gp.playerId===commanderDamageTargetId){
+    return `<div class="cmd-mode-overlay">
+      <div class="cmd-mode-kicker">Commander Damage für</div>
+      <div class="cmd-mode-name">${esc(target.name)}</div>
+      <div class="cmd-mode-target-life">${target.life} Leben</div>
+      <button class="cmd-mode-close" onclick="exitCommanderDamageMode()">✓ Fertig</button>
+    </div>`;
+  }
+  const value=target.commanderDamage[gp.playerId]||0;
+  return `<div class="cmd-mode-overlay source">
+    <div class="cmd-mode-kicker">${esc(gp.name)} · Commander</div>
+    <div class="cmd-mode-name">${esc(gp.commander.name)}</div>
+    <div class="cmd-mode-value">${value}</div>
+    <div class="cmd-mode-controls">
+      <button class="cmd-mode-btn" onclick="changeCommanderDamageInMode('${commanderDamageTargetId}','${gp.playerId}',-1)">−</button>
+      <button class="cmd-mode-btn" onclick="changeCommanderDamageInMode('${commanderDamageTargetId}','${gp.playerId}',1)">+</button>
+    </div>
+  </div>`;
+}
+function changeCommanderDamageInMode(targetId,sourceId,n){
+  changeCommanderDamage(targetId,sourceId,n);
+  // renderLiveGame keeps the mode visible and updates all quadrants.
 }
 
 function closeSheet(){document.getElementById('gameSheetBackdrop')?.remove()}
@@ -1322,7 +1404,7 @@ function openCommanderDamageSheet(id){
 }
 function openPlayerSheet(id){
   const p=getLivePlayer(id);if(!p)return;
-  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="openCommanderDamageSheet('${id}')">Commander-Schaden</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
+  makeSheet(p.name,p.commander.name,`<div class="sheet-grid"><button class="sheet-action" onclick="changeLife('${id}',-5);closeSheet()">−5 Leben</button><button class="sheet-action" onclick="changeLife('${id}',5);closeSheet()">+5 Leben</button><button class="sheet-action" onclick="closeSheet();enterCommanderDamageMode('${id}')">Commander-Schaden</button><button class="sheet-action danger" onclick="toggleEliminated('${id}');closeSheet()">${p.eliminated?'Zurück ins Spiel':'Spieler eliminieren'}</button></div>`);
 }
 function openGameMenu(){
   makeSheet('Partie',`Zug ${liveGame.turn} · ${formatTime(elapsedSeconds())}`,`<div class="sheet-grid"><button class="sheet-action" onclick="undoLastAction();closeSheet()">↶ Rückgängig</button><button class="sheet-action" onclick="nextTurn();closeSheet()">Nächster Zug →</button><button class="sheet-action" onclick="showEventLogSheet()">Partieprotokoll</button><button class="sheet-action danger" onclick="closeSheet();finishGame()">Partie beenden</button></div>`);
@@ -1371,7 +1453,7 @@ function saveFinishedGame(){
   const record={id:liveGame.id,date:liveGame.startedAt,endedAt:new Date().toISOString(),durationSeconds:elapsedSeconds(),turns:liveGame.turn,winnerId,placements,events:liveGame.events,
     players:liveGame.players.map(p=>({playerId:p.playerId,commander:p.commander,finalLife:p.life,poison:p.poison,commanderTax:p.commanderTax,commanderDamage:p.commanderDamage,eliminated:p.eliminated,placement:placements[p.playerId]}))};
   state.games.push(record);
-  clearInterval(gameTimerHandle);document.body.classList.remove('game-running');liveGame=null;Object.keys(gameSelection).forEach(k=>delete gameSelection[k]);
+  clearInterval(gameTimerHandle);commanderDamageTargetId=null;document.body.classList.remove('cmd-mode');document.body.classList.remove('game-running');liveGame=null;Object.keys(gameSelection).forEach(k=>delete gameSelection[k]);
   document.getElementById('finishOverlay')?.remove();document.getElementById('gameSetupView').style.display='block';document.getElementById('liveGameView').style.display='none';
   saveState();go('history');
 }
