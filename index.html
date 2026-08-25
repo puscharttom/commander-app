@@ -867,6 +867,12 @@ body.game-running #game{display:block!important}
  .table-hud{transform:translate(-50%,-50%) scale(.88)}
 }
 
+
+.version-label{margin-left:auto;color:#aaa39c;font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.swipe-hint{position:absolute;top:50%;z-index:7;width:5px;height:62px;transform:translateY(-50%);border-radius:999px;background:rgba(255,255,255,.32);pointer-events:none}
+.swipe-hint.left{left:5px}.swipe-hint.right{right:5px}
+.life-zone.longpress-active{background:rgba(255,255,255,.10)}
+@media(max-width:600px){.version-label{font-size:9px;letter-spacing:.1em}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/webp" href="./assets/commander-app-icon.webp">
@@ -881,7 +887,7 @@ body.game-running #game{display:block!important}
     <div class="wordmark">Commander Hub</div>
   </div>
   
-</header>
+<div class="version-label">V0.7.1</div></header>
 
 <nav class="nav" id="nav">
   <button data-view="home" class="active">Übersicht</button>
@@ -1194,7 +1200,8 @@ function renderLiveGame(){
     const totalCmd=Math.max(0,...Object.values(gp.commanderDamage||{}));
     return `<article class="table-player ${gp.eliminated?'eliminated':''} ${i===liveGame.activeIndex?'active-turn':''}" style="--commander-art:url('${esc(art)}')">
       <div class="table-top"><div><div class="table-name">${esc(gp.name)}${dangerReason(gp)?` <span class="warning-badge">${esc(dangerReason(gp))}</span>`:''}</div><div class="table-commander">${esc(gp.commander.name)}</div></div>${i===liveGame.activeIndex?'<span class="turn-dot"></span>':''}</div>
-      <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" onclick="changeLife('${gp.playerId}',-1)">−</button><button class="life-zone" aria-label="1 Leben erhalten" onclick="changeLife('${gp.playerId}',1)">+</button></div>
+      <div class="swipe-hint left"></div><div class="swipe-hint right"></div>
+      <div class="life-tap"><button class="life-zone" aria-label="1 Leben verlieren" data-player="${gp.playerId}" data-delta="-1">−</button><button class="life-zone" aria-label="1 Leben erhalten" data-player="${gp.playerId}" data-delta="1">+</button></div>
       <div class="life-display">${gp.life}</div><div class="life-hint">− &nbsp;&nbsp; Leben &nbsp;&nbsp; +</div>
       <div class="table-bottom">
         <div class="quick-counters">
@@ -1206,6 +1213,7 @@ function renderLiveGame(){
       </div>
     </article>`
   }).join('');
+  bindTableGestures();
 }
 function getLivePlayer(id){return liveGame?.players.find(p=>p.playerId===id)}
 function dangerReason(p){
@@ -1228,8 +1236,13 @@ function changeCounter(id,key,n){
 }
 function changeCommanderDamage(targetId,sourceId,n){
   const p=getLivePlayer(targetId),src=getLivePlayer(sourceId);if(!p||!src)return;
-  const before=snapshotPlayer(p);p.commanderDamage[sourceId]=Math.max(0,(p.commanderDamage[sourceId]||0)+n);
-  addEvent('commander_damage',targetId,{sourceId,delta:n,before,after:snapshotPlayer(p)},`${p.name}: ${n>0?'+':''}${n} Commander-Schaden von ${src.commander.name} → ${p.commanderDamage[sourceId]}`);
+  const before=snapshotPlayer(p);
+  const oldDamage=p.commanderDamage[sourceId]||0;
+  const newDamage=Math.max(0,oldDamage+n);
+  const actualDelta=newDamage-oldDamage;
+  p.commanderDamage[sourceId]=newDamage;
+  p.life-=actualDelta;
+  addEvent('commander_damage',targetId,{sourceId,delta:actualDelta,before,after:snapshotPlayer(p)},`${p.name}: ${actualDelta>0?'+':''}${actualDelta} Commander-Schaden von ${src.commander.name} → ${newDamage} · Leben ${p.life}`);
   renderLiveGame();
 }
 function toggleEliminated(id){
@@ -1259,6 +1272,36 @@ function renderEventLog(){
   const box=document.getElementById('eventLog'),count=document.getElementById('eventLogCount');if(!box||!liveGame)return;
   count.textContent=`(${liveGame.events.length})`;
   box.innerHTML=liveGame.events.length?liveGame.events.slice().reverse().map(ev=>`<div class="event-item"><div class="event-time">ZUG ${ev.turn}<br>${new Date(ev.at).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div><div>${esc(ev.label||ev.type)}</div></div>`).join(''):`<div class="empty">Noch keine Aktionen.</div>`;
+}
+
+
+function bindTableGestures(){
+  document.querySelectorAll('.life-zone').forEach(zone=>{
+    let sx=0,sy=0,moved=false,longFired=false,timer=null;
+    const id=zone.dataset.player,delta=Number(zone.dataset.delta);
+    zone.addEventListener('pointerdown',e=>{
+      sx=e.clientX;sy=e.clientY;moved=false;longFired=false;
+      zone.setPointerCapture?.(e.pointerId);
+      timer=setTimeout(()=>{
+        if(moved)return;
+        longFired=true;zone.classList.add('longpress-active');
+        if(navigator.vibrate)navigator.vibrate(25);
+        changeLife(id,delta*5);
+      },520);
+    });
+    zone.addEventListener('pointermove',e=>{
+      const dx=e.clientX-sx,dy=e.clientY-sy;
+      if(Math.abs(dx)>12||Math.abs(dy)>12){moved=true;clearTimeout(timer)}
+    });
+    zone.addEventListener('pointerup',e=>{
+      clearTimeout(timer);zone.classList.remove('longpress-active');
+      const dx=e.clientX-sx,dy=e.clientY-sy;
+      if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy)*1.25){openCommanderDamageSheet(id);return}
+      if(!moved&&!longFired)changeLife(id,delta);
+    });
+    zone.addEventListener('pointercancel',()=>{clearTimeout(timer);zone.classList.remove('longpress-active')});
+    zone.addEventListener('contextmenu',e=>e.preventDefault());
+  });
 }
 
 function closeSheet(){document.getElementById('gameSheetBackdrop')?.remove()}
